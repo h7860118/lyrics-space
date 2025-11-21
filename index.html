@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>歌詞加空格工具</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif;
+      background: #f6f6f6;
+    }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 16px 50px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 32px;
+      font-weight: 900;
+    }
+
+    .subtitle {
+      margin-bottom: 24px;
+      opacity: .75;
+      font-size: 16px;
+    }
+
+    .panel {
+      display: grid;
+      grid-template-columns: 1.3fr auto 1.3fr;
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 480px;
+      border-radius: 24px;
+      border: none;
+      padding: 20px 22px;
+      font-size: 16px;
+      line-height: 1.8;
+      resize: vertical;
+      background: #ffffff;
+      box-shadow: 0 8px 24px rgba(0,0,0,.12);
+      outline: none;
+    }
+
+    textarea:focus {
+      box-shadow: 0 10px 26px rgba(0,0,0,.18);
+    }
+
+    .btn-col {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .btn {
+      border: none;
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 16px 24px;
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+      box-shadow: 0 6px 14px rgba(0,0,0,.25);
+      background: linear-gradient(135deg,#ff9a9e,#fecf73);
+      transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0,0,0,.28);
+      filter: brightness(1.05);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 10px rgba(0,0,0,.2);
+      filter: brightness(.95);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg,#42a5f5,#1565c0);
+    }
+
+    .btn.green {
+      background: linear-gradient(135deg,#66bb6a,#2e7d32);
+    }
+
+    .btn.red {
+      background: linear-gradient(135deg,#ef5350,#c62828);
+    }
+
+    .btn.full {
+      width: 160px;
+      align-self: center;
+    }
+
+    .footer-note {
+      margin-top: 32px;
+      font-size: 14px;
+      opacity: .7;
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      .panel {
+        grid-template-columns: 1fr;
+      }
+      textarea {
+        min-height: 280px;
+      }
+      .btn-col {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .btn.full {
+        width: auto;
+        flex: 1 1 40%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>歌詞加空格</h1>
+    <div class="subtitle">貼上歌詞 → 一鍵轉換成「每個字之間都有空格」的版本，方便做字幕、逐字稿或排版。</div>
+
+    <div class="panel">
+      <!-- 左側原始歌詞 -->
+      <textarea id="inputLyrics" placeholder="在這裡貼上原始歌詞..."></textarea>
+
+      <!-- 中間按鈕 -->
+      <div class="btn-col">
+        <button class="btn" id="btnPaste">貼上</button>
+        <button class="btn primary" id="btnConvert">轉換</button>
+        <button class="btn" id="btnCopy">複製</button>
+        <button class="btn red" id="btnClear">清空</button>
+        <button class="btn green full" id="btnOneClick">一鍵完成</button>
+      </div>
+
+      <!-- 右側加空格後歌詞 -->
+      <textarea id="outputLyrics" placeholder="這裡會顯示加空格後的歌詞..." readonly></textarea>
+    </div>
+
+    <div class="footer-note">
+      小提醒：本工具完全在瀏覽器內運算，不會上傳任何內容到伺服器。
+    </div>
+  </div>
+
+  <script>
+    function addSpacesToLyrics(text) {
+      return text
+        .split('\n')
+        .map(line => line.split('').join(' '))
+        .join('\n');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const inputEl  = document.getElementById('inputLyrics');
+      const outputEl = document.getElementById('outputLyrics');
+
+      document.getElementById('btnConvert').addEventListener('click', () => {
+        const src = inputEl.value || '';
+        outputEl.value = addSpacesToLyrics(src);
+      });
+
+      document.getElementById('btnClear').addEventListener('click', () => {
+        inputEl.value = '';
+        outputEl.value = '';
+      });
+
+      document.getElementById('btnPaste').addEventListener('click', async () => {
+        try {
+          const text = await navigator.clipboard.readText();
+          inputEl.value = text;
+        } catch (err) {
+          alert('無法從剪貼簿讀取內容，請確認瀏覽器權限，或改用手動貼上。');
+        }
+      });
+
+      document.getElementById('btnCopy').addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(outputEl.value || '');
+          if (outputEl.value) {
+            alert('已複製加空格後的歌詞！');
+          }
+        } catch (err) {
+          outputEl.select();
+          document.execCommand('copy');
+          alert('已嘗試複製，如未成功請手動複製。');
+        }
+      });
+
+      document.getElementById('btnOneClick').addEventListener('click', async () => {
+        try {
+          const text = await navigator.clipboard.readText();
+          inputEl.value = text;
+          const converted = addSpacesToLyrics(text);
+          outputEl.value = converted;
+          await navigator.clipboard.writeText(converted);
+          alert('已完成：貼上 ➜ 轉換 ➜ 複製，到處可直接貼用了！');
+        } catch (err) {
+          alert('一鍵完成失敗，可能是瀏覽器不允許同時讀寫剪貼簿，請改用「貼上」➜「轉換」➜「複製」。');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
