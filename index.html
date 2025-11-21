@@ -2,176 +2,107 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <title>歌詞加空格工具</title>
+  <title>歌詞加空格 工具</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    * { box-sizing: border-box; }
-
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif;
-      background: #f6f6f6;
+      font-family: "微軟正黑體", sans-serif;
+      background: linear-gradient(135deg, #f8d7b8, #f2e6c2);
+      background-attachment: fixed;
     }
 
-    .wrap {
-      max-width: 1200px;
+    .container {
+      max-width: 1300px;
       margin: 0 auto;
-      padding: 32px 16px 50px;
-    }
-
-    h1 {
-      margin: 0 0 12px;
-      font-size: 32px;
-      font-weight: 900;
-    }
-
-    .subtitle {
-      margin-bottom: 24px;
-      opacity: .75;
-      font-size: 16px;
-    }
-
-    .panel {
-      display: grid;
-      grid-template-columns: 1.3fr auto 1.3fr;
-      gap: 22px;
-      align-items: stretch;
+      padding: 30px;
+      display: flex;
+      gap: 40px;
     }
 
     textarea {
       width: 100%;
-      min-height: 480px;
-      border-radius: 24px;
-      border: none;
-      padding: 20px 22px;
-      font-size: 16px;
+      height: 600px;
+      padding: 20px;
+      border-radius: 12px;
+      font-size: 24px;
       line-height: 1.8;
-      resize: vertical;
-      background: #ffffff;
-      box-shadow: 0 8px 24px rgba(0,0,0,.12);
+      border: none;
       outline: none;
-      white-space: pre-wrap;
+      resize: none;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     }
 
-    textarea:focus {
-      box-shadow: 0 10px 26px rgba(0,0,0,.18);
+    .right-box {
+      width: 100%;
     }
 
-    .btn-col {
+    .btn-area {
       display: flex;
       flex-direction: column;
-      gap: 18px;
-      align-items: stretch;
-      justify-content: center;
+      gap: 25px;
+      margin-top: 40px;
     }
 
-    .btn {
+    button {
+      width: 200px;
+      height: 70px;
+      font-size: 28px;
+      border-radius: 50px;
       border: none;
       cursor: pointer;
-      border-radius: 999px;
-      padding: 16px 24px;
-      font-size: 18px;
-      font-weight: 800;
-      color: #fff;
-      box-shadow: 0 6px 14px rgba(0,0,0,.25);
-      background: linear-gradient(135deg, #ff9a9e, #fecf73);
-      transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
-      white-space: nowrap;
+      color: white;
+      font-weight: bold;
+      transition: 0.2s;
     }
 
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(0,0,0,.28);
-      filter: brightness(1.05);
+    .btn1 { background: linear-gradient(135deg, #ff9a9e, #fecf76); }
+    .btn2 { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+    .btn3 { background: linear-gradient(135deg, #ff9a9e, #fecf76); }
+    .btn4 { background: linear-gradient(135deg, #f5576c, #e94560); }
+    .btn5 { background: linear-gradient(135deg, #42e695, #3bb2b8); }
+
+    button:hover {
+      transform: scale(1.03);
     }
 
-    .btn:active {
-      transform: translateY(0);
-      box-shadow: 0 4px 10px rgba(0,0,0,.2);
-      filter: brightness(.95);
+    h1 {
+      font-size: 60px;
+      margin: 30px;
+      margin-bottom: 10px;
+      font-weight: 900;
     }
 
-    .btn.primary {
-      background: linear-gradient(135deg, #42a5f5, #1565c0);
-    }
-
-    .btn.green {
-      background: linear-gradient(135deg, #66bb6a, #2e7d32);
-    }
-
-    .btn.red {
-      background: linear-gradient(135deg, #ef5350, #c62828);
-    }
-
-    .btn.full {
-      width: 160px;
-      align-self: center;
-    }
-
-    .footer-note {
-      margin-top: 32px;
-      font-size: 14px;
-      opacity: .7;
-      text-align: center;
-    }
-
-    @media (max-width: 900px) {
-      .panel {
-        grid-template-columns: 1fr;
-      }
-      textarea {
-        min-height: 280px;
-      }
-      .btn-col {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-      }
-      .btn.full {
-        width: auto;
-        flex: 1 1 40%;
-      }
-    }
   </style>
 </head>
 
 <body>
-  <div class="wrap">
-    <h1>歌詞加空格</h1>
-    <div class="subtitle">
-      貼上歌詞 → 一鍵轉換成「每個字之間都有空格」的版本，方便做字幕、逐字稿或排版。
+  <h1>歌詞加空格</h1>
+
+  <div class="container">
+    <textarea id="input" placeholder="請貼上歌詞..."></textarea>
+
+    <div class="btn-area">
+      <button class="btn1" onclick="pasteText()">貼上</button>
+      <button class="btn2" onclick="convert()">轉換</button>
+      <button class="btn3" onclick="copyText()">複製</button>
+      <button class="btn4" onclick="clearText()">清空</button>
+      <button class="btn5" onclick="done()">一鍵完成</button>
     </div>
 
-    <div class="panel">
-
-      <!-- 左側原始歌詞 -->
-      <textarea id="inputLyrics" placeholder="在這裡貼上原始歌詞..."></textarea>
-
-      <!-- 中間按鈕 -->
-      <div class="btn-col">
-        <button class="btn" id="btnPaste">貼上</button>
-        <button class="btn primary" id="btnConvert">轉換</button>
-        <button class="btn" id="btnCopy">複製</button>
-        <button class="btn red" id="btnClear">清空</button>
-        <button class="btn green full" id="btnOneClick">一鍵完成</button>
-      </div>
-
-      <!-- 右側加空格後歌詞 -->
-      <textarea id="outputLyrics" placeholder="這裡會顯示加空格後的歌詞..." readonly></textarea>
-    </div>
-
-    <div class="footer-note">
-      本工具完全在瀏覽器運算，不會上傳任何內容到伺服器。
-    </div>
+    <textarea id="output" placeholder="結果會顯示在這裡..."></textarea>
   </div>
 
   <script>
-    // ⭐ 改成更接近你要的「桃船長空格效果」
+    // 🔥 規則：中文字與中文字中間加空格，但英文單字完全保持不變
     function addSpacesToLyrics(text) {
+      const isCJK = ch =>
+        /[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]/.test(ch);
+
       return text
         .split('\n')
         .map(line => {
-          const chars = [...line]; // 正確切開所有字
+          const chars = [...line];
           let out = '';
 
           for (let i = 0; i < chars.length; i++) {
@@ -180,64 +111,48 @@
 
             out += curr;
 
+            // 行尾不處理
             if (i === chars.length - 1) continue;
+
+            // 原本有空白不處理
             if (curr === ' ' || next === ' ') continue;
 
-            out += ' ';
+            // 若兩個都是中文 → 插入空格
+            if (isCJK(curr) && isCJK(next)) {
+              out += ' ';
+            }
           }
-
           return out;
         })
         .join('\n');
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const inputEl = document.getElementById("inputLyrics");
-      const outputEl = document.getElementById("outputLyrics");
-
-      document.getElementById("btnConvert").addEventListener("click", () => {
-        outputEl.value = addSpacesToLyrics(inputEl.value);
+    function pasteText() {
+      navigator.clipboard.readText().then(text => {
+        document.getElementById("input").value = text;
       });
+    }
 
-      document.getElementById("btnClear").addEventListener("click", () => {
-        inputEl.value = "";
-        outputEl.value = "";
-      });
+    function convert() {
+      const input = document.getElementById("input").value;
+      document.getElementById("output").value = addSpacesToLyrics(input);
+    }
 
-      document.getElementById("btnPaste").addEventListener("click", async () => {
-        try {
-          const text = await navigator.clipboard.readText();
-          inputEl.value = text;
-        } catch (err) {
-          alert("⚠️ 無法讀取剪貼簿，請手動貼上！");
-        }
-      });
+    function copyText() {
+      const text = document.getElementById("output").value;
+      navigator.clipboard.writeText(text);
+      alert("已複製！");
+    }
 
-      document.getElementById("btnCopy").addEventListener("click", async () => {
-        try {
-          await navigator.clipboard.writeText(outputEl.value);
-          alert("已複製！");
-        } catch (err) {
-          outputEl.select();
-          document.execCommand("copy");
-          alert("已嘗試複製，如未成功請手動複製。");
-        }
-      });
+    function clearText() {
+      document.getElementById("input").value = "";
+      document.getElementById("output").value = "";
+    }
 
-      document.getElementById("btnOneClick").addEventListener("click", async () => {
-        try {
-          const text = await navigator.clipboard.readText();
-          inputEl.value = text;
-          const spaced = addSpacesToLyrics(text);
-          outputEl.value = spaced;
-
-          await navigator.clipboard.writeText(spaced);
-          alert("✔ 已完成：貼上 ➜ 轉換 ➜ 複製！");
-        } catch (err) {
-          alert("⚠️ 無法一鍵完成，請分步操作。");
-        }
-      });
-    });
+    function done() {
+      convert();
+      copyText();
+    }
   </script>
 </body>
 </html>
