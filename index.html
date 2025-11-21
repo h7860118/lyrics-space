@@ -9,7 +9,7 @@
 
     body {
       margin: 0;
-      font-family: -apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif;
       background: #f6f6f6;
     }
 
@@ -50,6 +50,7 @@
       background: #ffffff;
       box-shadow: 0 8px 24px rgba(0,0,0,.12);
       outline: none;
+      white-space: pre-wrap;
     }
 
     textarea:focus {
@@ -73,7 +74,7 @@
       font-weight: 800;
       color: #fff;
       box-shadow: 0 6px 14px rgba(0,0,0,.25);
-      background: linear-gradient(135deg,#ff9a9e,#fecf73);
+      background: linear-gradient(135deg, #ff9a9e, #fecf73);
       transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
       white-space: nowrap;
     }
@@ -91,15 +92,15 @@
     }
 
     .btn.primary {
-      background: linear-gradient(135deg,#42a5f5,#1565c0);
+      background: linear-gradient(135deg, #42a5f5, #1565c0);
     }
 
     .btn.green {
-      background: linear-gradient(135deg,#66bb6a,#2e7d32);
+      background: linear-gradient(135deg, #66bb6a, #2e7d32);
     }
 
     .btn.red {
-      background: linear-gradient(135deg,#ef5350,#c62828);
+      background: linear-gradient(135deg, #ef5350, #c62828);
     }
 
     .btn.full {
@@ -133,12 +134,16 @@
     }
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <h1>歌詞加空格</h1>
-    <div class="subtitle">貼上歌詞 → 一鍵轉換成「每個字之間都有空格」的版本，方便做字幕、逐字稿或排版。</div>
+    <div class="subtitle">
+      貼上歌詞 → 一鍵轉換成「每個字之間都有空格」的版本，方便做字幕、逐字稿或排版。
+    </div>
 
     <div class="panel">
+
       <!-- 左側原始歌詞 -->
       <textarea id="inputLyrics" placeholder="在這裡貼上原始歌詞..."></textarea>
 
@@ -156,64 +161,80 @@
     </div>
 
     <div class="footer-note">
-      小提醒：本工具完全在瀏覽器內運算，不會上傳任何內容到伺服器。
+      本工具完全在瀏覽器運算，不會上傳任何內容到伺服器。
     </div>
   </div>
 
   <script>
+    // ⭐ 改成更接近你要的「桃船長空格效果」
     function addSpacesToLyrics(text) {
       return text
         .split('\n')
-        .map(line => line.split('').join(' '))
+        .map(line => {
+          const chars = [...line]; // 正確切開所有字
+          let out = '';
+
+          for (let i = 0; i < chars.length; i++) {
+            const curr = chars[i];
+            const next = chars[i + 1];
+
+            out += curr;
+
+            if (i === chars.length - 1) continue;
+            if (curr === ' ' || next === ' ') continue;
+
+            out += ' ';
+          }
+
+          return out;
+        })
         .join('\n');
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const inputEl  = document.getElementById('inputLyrics');
-      const outputEl = document.getElementById('outputLyrics');
+    document.addEventListener("DOMContentLoaded", () => {
+      const inputEl = document.getElementById("inputLyrics");
+      const outputEl = document.getElementById("outputLyrics");
 
-      document.getElementById('btnConvert').addEventListener('click', () => {
-        const src = inputEl.value || '';
-        outputEl.value = addSpacesToLyrics(src);
+      document.getElementById("btnConvert").addEventListener("click", () => {
+        outputEl.value = addSpacesToLyrics(inputEl.value);
       });
 
-      document.getElementById('btnClear').addEventListener('click', () => {
-        inputEl.value = '';
-        outputEl.value = '';
+      document.getElementById("btnClear").addEventListener("click", () => {
+        inputEl.value = "";
+        outputEl.value = "";
       });
 
-      document.getElementById('btnPaste').addEventListener('click', async () => {
+      document.getElementById("btnPaste").addEventListener("click", async () => {
         try {
           const text = await navigator.clipboard.readText();
           inputEl.value = text;
         } catch (err) {
-          alert('無法從剪貼簿讀取內容，請確認瀏覽器權限，或改用手動貼上。');
+          alert("⚠️ 無法讀取剪貼簿，請手動貼上！");
         }
       });
 
-      document.getElementById('btnCopy').addEventListener('click', async () => {
+      document.getElementById("btnCopy").addEventListener("click", async () => {
         try {
-          await navigator.clipboard.writeText(outputEl.value || '');
-          if (outputEl.value) {
-            alert('已複製加空格後的歌詞！');
-          }
+          await navigator.clipboard.writeText(outputEl.value);
+          alert("已複製！");
         } catch (err) {
           outputEl.select();
-          document.execCommand('copy');
-          alert('已嘗試複製，如未成功請手動複製。');
+          document.execCommand("copy");
+          alert("已嘗試複製，如未成功請手動複製。");
         }
       });
 
-      document.getElementById('btnOneClick').addEventListener('click', async () => {
+      document.getElementById("btnOneClick").addEventListener("click", async () => {
         try {
           const text = await navigator.clipboard.readText();
           inputEl.value = text;
-          const converted = addSpacesToLyrics(text);
-          outputEl.value = converted;
-          await navigator.clipboard.writeText(converted);
-          alert('已完成：貼上 ➜ 轉換 ➜ 複製，到處可直接貼用了！');
+          const spaced = addSpacesToLyrics(text);
+          outputEl.value = spaced;
+
+          await navigator.clipboard.writeText(spaced);
+          alert("✔ 已完成：貼上 ➜ 轉換 ➜ 複製！");
         } catch (err) {
-          alert('一鍵完成失敗，可能是瀏覽器不允許同時讀寫剪貼簿，請改用「貼上」➜「轉換」➜「複製」。');
+          alert("⚠️ 無法一鍵完成，請分步操作。");
         }
       });
     });
