@@ -2,226 +2,237 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <title>歌詞空格編輯器｜LouisLiao Piano 鋼琴編曲</title>
+  <title>歌詞空格編輯器 · LouisLiao Piano 鋼琴編曲</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <style>
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif;
-      background: #e9d8c0; /* 接近官網的米色底 */
-      background: radial-gradient(circle at top, #f7ecd7 0, #e3d1b7 45%, #dcc6aa 100%);
+      background: #eee4d4;
       background-attachment: fixed;
-      color: #5b3b26;
     }
 
     .wrap {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 24px 16px 48px;
+      padding: 32px 16px 80px;
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
 
-    /* --------------- 頂端區：標題 + 品牌 LOGO --------------- */
-    .topbar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 4px;
-    }
-
-    .app-title {
-      font-size: 26px;
-      font-weight: 900;
-      letter-spacing: 0.12em;
-      color: #4d311f;
-    }
-
-    .brand-pill {
-      display: inline-flex;
-      align-items: center;
-      padding: 8px 18px;
-      border-radius: 999px;
-      background: #f8e7cf;
-      box-shadow: 0 4px 10px rgba(0,0,0,.18);
-      font-size: 15px;
-      font-weight: 700;
-      color: #7b4b2c;
-      text-decoration: none;
-      gap: 8px;
-      transition: transform .15s ease, box-shadow .15s ease, background .15s ease, filter .15s ease;
-      white-space: nowrap;
-    }
-
-    .brand-pill::before {
-      content: "♪";
-      font-size: 17px;
-    }
-
-    .brand-pill:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 14px rgba(0,0,0,.24);
-      filter: brightness(1.03);
-      background: #f9e1be;
-    }
-
-    .brand-pill:active {
-      transform: translateY(0);
-      box-shadow: 0 3px 8px rgba(0,0,0,.18);
-      filter: brightness(.97);
-    }
-
-    /* --------------- 說明文字 --------------- */
-    .subtitle {
-      opacity: .88;
-      font-size: 14px;
-      line-height: 1.7;
-    }
-
-    .subtitle span {
+    /* LOGO 區塊 */
+    .logo-bar {
       display: inline-block;
-      margin-right: 6px;
+      background: #f7eddc;
+      padding: 14px 26px;
+      border-radius: 12px;
+      font-size: 24px;
+      font-weight: 700;
+      color: #5a4630;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(0,0,0,.12);
+      transition: transform .15s ease;
     }
 
-    /* --------------- 主體：左右歌詞 + 中間按鈕 --------------- */
+    .logo-bar:hover {
+      transform: translateY(-2px);
+    }
+
+    .subtitle {
+      opacity: .85;
+      font-size: 15px;
+      margin-top: 8px;
+      line-height: 1.6;
+      color: #5d4c3c;
+    }
+
     .panel {
-      margin-top: 10px;
+      margin-top: 16px;
       display: grid;
-      grid-template-columns: 1.4fr auto 1.4fr;
+      grid-template-columns: 1.3fr auto 1.3fr;
       gap: 24px;
       align-items: stretch;
     }
 
     textarea {
       width: 100%;
-      min-height: 480px;
+      min-height: 520px;
       border-radius: 24px;
       border: none;
       padding: 20px 22px;
-      font-size: 17px;
+      font-size: 18px;
       line-height: 1.8;
       resize: vertical;
-      background: #fdfaf6;
-      box-shadow: 0 10px 26px rgba(0,0,0,.18);
+      background: #ffffff;
+      box-shadow: 0 8px 22px rgba(0,0,0,.15);
       outline: none;
-      white-space: pre-wrap; /* 保留換行 */
-    }
-
-    textarea:focus {
-      box-shadow: 0 12px 30px rgba(0,0,0,.22);
+      white-space: pre-wrap;
     }
 
     .btn-col {
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 22px;
       align-items: center;
       justify-content: center;
     }
 
-    /* --------------- 溫柔版按鈕樣式 --------------- */
     .btn {
       border: none;
       cursor: pointer;
       border-radius: 999px;
       padding: 16px 34px;
-      font-size: 19px;
+      font-size: 20px;
       font-weight: 800;
-      color: #5a3b2a;
-      background: linear-gradient(145deg, #fbe4cc, #f2cfb0);
-      box-shadow:
-        0 10px 18px rgba(0,0,0,.18),
-        inset 0 1px 0 rgba(255,255,255,.6);
-      transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(0,0,0,.25);
+      background: linear-gradient(135deg, #f7d7c4, #e3bfa6);
+      transition: all .15s ease;
       white-space: nowrap;
-      min-width: 150px;
+      width: 160px;
       text-align: center;
     }
 
-    .btn.blue {
-      background: linear-gradient(145deg, #f1dacb, #dfc1af);
-    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn:active { transform: translateY(0); }
 
-    .btn.red {
-      background: linear-gradient(145deg, #f6d3c5, #e5b7a7);
-    }
-
-    .btn.green {
-      background: linear-gradient(145deg, #f0e1c8, #e1cfae);
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow:
-        0 12px 22px rgba(0,0,0,.22),
-        inset 0 1px 0 rgba(255,255,255,.7);
-      filter: brightness(1.02);
-    }
-
-    .btn:active {
-      transform: translateY(0);
-      box-shadow:
-        0 6px 12px rgba(0,0,0,.18),
-        inset 0 1px 0 rgba(255,255,255,.55);
-      filter: brightness(.98);
-    }
+    .btn.blue  { background: linear-gradient(135deg, #c6d7f2, #8baadd); }
+    .btn.red   { background: linear-gradient(135deg, #f4b5b5, #da8c8c); }
+    .btn.green { background: linear-gradient(135deg, #c9e4c5, #9fcaa1); }
 
     .footer-note {
-      margin-top: 10px;
+      margin-top: 16px;
       font-size: 13px;
       opacity: .7;
       text-align: center;
     }
 
     @media (max-width: 900px) {
-      .panel {
-        grid-template-columns: 1fr;
-      }
-      textarea {
-        min-height: 280px;
-      }
+      .panel { grid-template-columns: 1fr; }
+      textarea { min-height: 320px; }
       .btn-col {
         flex-direction: row;
         flex-wrap: wrap;
       }
-      .btn {
-        min-width: 0;
-        flex: 1 1 40%;
-      }
-      .topbar {
-        flex-direction: column;
-        align-items: flex-start;
-      }
     }
+
+
+    /* ===================== */
+    /* LINE 漂浮客服按鈕     */
+    /* ===================== */
+
+    .fab-wrapper {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 999;
+      font-family: inherit;
+    }
+
+    .fab-main {
+      width: 60px;
+      height: 60px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #5fc86e, #3aa94a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 28px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, .25);
+      cursor: pointer;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .fab-main:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(0,0,0,.3);
+    }
+
+    .fab-panel {
+      position: absolute;
+      right: 0;
+      bottom: 72px;
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 12px 16px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.25);
+      min-width: 170px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(6px);
+      transition: all .2s ease;
+    }
+
+    .fab-wrapper.open .fab-panel {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .fab-panel-title {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+
+    .fab-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      padding: 6px 0;
+      color: #374151;
+    }
+
+    .fab-link-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: #06c755;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .fab-link-label span:first-child { font-weight: 600; }
+    .fab-link-label span:last-child {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .fab-main span { transition: transform .2s ease; }
+    .fab-wrapper.open .fab-main span { transform: rotate(45deg); }
+
   </style>
 </head>
 
+
 <body>
+
   <div class="wrap">
-    <!-- 頂端：標題 + LOGO 連回官網 -->
-    <div class="topbar">
-      <div class="app-title">歌詞空格編輯器</div>
-      <a class="brand-pill" href="https://louisliaopiano.com/" target="_blank" rel="noopener noreferrer">
-        LouisLiao Piano 鋼琴編曲
-      </a>
+
+    <!-- LOGO（可點回官網） -->
+    <a class="logo-bar" href="https://louisliaopiano.com" target="_blank">
+      🎵 歌詞空格編輯器 · LouisLiao Piano 鋼琴編曲
+    </a>
+
+    <div class="subtitle">
+      ✔ 中文：移除標點，只保留字與空白，自動在相鄰中文字加入「一字一空格」。<br>
+      ✔ 英文：保留單字與撇號，不拆字，僅移除標點。<br>
+      ✔ 本工具完全在瀏覽器運算，不會上傳任何資料。
     </div>
 
-    <!-- 使用說明 -->
-    <div class="subtitle">
-      <span>✅ 中文：移除所有標點，只保留字與空白，並在相鄰中文字之間自動「一字一空格」，方便 Sibelius 輸入。</span><br>
-      <span>✅ 英文：移除標點（保留空白與 ' ），不拆單字，由 Sibelius 自己排版。</span>
-    </div>
 
     <div class="panel">
-      <!-- 左邊：原始歌詞 -->
-      <textarea id="inputLyrics" placeholder="在這裡貼上原始歌詞（簡繁 / 繁體 / 英文都可以）"></textarea>
+      <textarea id="inputLyrics" placeholder="在這裡貼上原始歌詞（中英皆可）"></textarea>
 
-      <!-- 中間按鈕 -->
       <div class="btn-col">
         <button class="btn" id="btnPaste">貼上</button>
         <button class="btn blue" id="btnConvert">轉換</button>
@@ -230,119 +241,124 @@
         <button class="btn green" id="btnOneClick">一鍵完成</button>
       </div>
 
-      <!-- 右邊：處理後歌詞 -->
       <textarea id="outputLyrics" placeholder="這裡會顯示處理後的歌詞…" readonly></textarea>
     </div>
 
-    <div class="footer-note">
-      本工具完全在瀏覽器內運算，不會上傳任何內容到伺服器。
+    <div class="footer-note">LouisLiao Piano © All Rights Reserved.</div>
+
+  </div>
+
+
+
+  <!-- =========================== -->
+  <!-- LINE 客服浮動按鈕          -->
+  <!-- =========================== -->
+  <div class="fab-wrapper" id="fabWrapper">
+    <div class="fab-main" id="fabMain"><span>＋</span></div>
+
+    <div class="fab-panel">
+      <div class="fab-panel-title">聯絡 LouisLiao 客服：</div>
+
+      <a class="fab-link" href="https://louisliaopiano.com/pages/llcs" target="_blank">
+        <div class="fab-link-icon">L</div>
+        <div class="fab-link-label">
+          <span>LINE 客服</span>
+          <span>點我前往聯絡</span>
+        </div>
+      </a>
     </div>
   </div>
 
+
+
+  <!-- =========================== -->
+  <!-- 主程式：標點處理＋中文加空格 -->
+  <!-- =========================== -->
+
   <script>
-    // 1) 統一奇怪的撇號成半形 '
-    function normalizeEnglishApostrophes(text) {
-      return text.replace(/[’‘ʼ´ʻ＇]/g, "'");
+    function normalizeApostrophe(t) {
+      return t.replace(/[’‘ʼ´ʻ＇]/g, "'");
     }
 
-    // 2) 移除所有標點符號（中英文），只保留：
-    //    - 英文大小寫
-    //    - 數字
-    //    - 常用中文（U+4E00–U+9FFF）
-    //    - 空白（含換行）
-    //    - 半形撇號 '
-    function removeAllPunctuation(text) {
-      return text.replace(/[^a-zA-Z0-9\u4E00-\u9FFF\s']/g, "");
+    function removePunctuation(t) {
+      return t.replace(/[^a-zA-Z0-9\u4E00-\u9FFF\s']/g, "");
     }
 
-    // 3) 只有「中文」之間加空格，英文不動
-    function addSpacesForChineseOnly(text) {
-      const isCJK = ch => /[\u3400-\u4DBF\u4E00-\u9FFF]/.test(ch);
-
-      return text
-        .split("\n")
-        .map(line => {
-          const chars = [...line];
-          let out = "";
-
-          for (let i = 0; i < chars.length; i++) {
-            const curr = chars[i];
-            const next = chars[i + 1];
-
-            out += curr;
-
-            if (!next) continue;
-            if (curr === " " || next === " ") continue;
-
-            if (isCJK(curr) && isCJK(next)) {
-              out += " ";
-            }
-          }
-          return out;
-        })
-        .join("\n");
+    function addCJKSpaces(t) {
+      const isCJK = ch => /[\u4E00-\u9FFF]/.test(ch);
+      return t.split("\n").map(line => {
+        let out = "";
+        const chars = [...line];
+        for (let i = 0; i < chars.length; i++) {
+          const curr = chars[i], next = chars[i+1];
+          out += curr;
+          if (next && isCJK(curr) && isCJK(next)) out += " ";
+        }
+        return out;
+      }).join("\n");
     }
 
-    // 4) 整體處理流程
     function processLyrics(text) {
       let t = text;
-      t = normalizeEnglishApostrophes(t); // 統一撇號
-      t = removeAllPunctuation(t);        // 清掉所有標點
-      t = addSpacesForChineseOnly(t);     // 中文加空格
+      t = normalizeApostrophe(t);
+      t = removePunctuation(t);
+      t = addCJKSpaces(t);
       return t;
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const inputEl  = document.getElementById("inputLyrics");
-      const outputEl = document.getElementById("outputLyrics");
+    document.getElementById("btnConvert").addEventListener("click", () => {
+      outputLyrics.value = processLyrics(inputLyrics.value);
+    });
 
-      // 轉換
-      document.getElementById("btnConvert").addEventListener("click", () => {
-        outputEl.value = processLyrics(inputEl.value);
-      });
+    document.getElementById("btnClear").addEventListener("click", () => {
+      inputLyrics.value = "";
+      outputLyrics.value = "";
+    });
 
-      // 清空
-      document.getElementById("btnClear").addEventListener("click", () => {
-        inputEl.value  = "";
-        outputEl.value = "";
-      });
+    document.getElementById("btnPaste").addEventListener("click", async () => {
+      try {
+        inputLyrics.value = await navigator.clipboard.readText();
+      } catch {
+        alert("無法讀取剪貼簿，請手動貼上");
+      }
+    });
 
-      // 從剪貼簿貼到左邊
-      document.getElementById("btnPaste").addEventListener("click", async () => {
-        try {
-          const text = await navigator.clipboard.readText();
-          inputEl.value = text;
-        } catch (err) {
-          alert("⚠️ 無法讀取剪貼簿，請手動貼上。");
-        }
-      });
+    document.getElementById("btnCopy").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(outputLyrics.value);
+        alert("已複製！");
+      } catch {
+        outputLyrics.select();
+        document.execCommand("copy");
+      }
+    });
 
-      // 把右邊複製回剪貼簿
-      document.getElementById("btnCopy").addEventListener("click", async () => {
-        try {
-          await navigator.clipboard.writeText(outputEl.value);
-          alert("已複製！");
-        } catch (err) {
-          outputEl.select();
-          document.execCommand("copy");
-          alert("已嘗試複製，如未成功請手動複製。");
-        }
-      });
+    document.getElementById("btnOneClick").addEventListener("click", async () => {
+      try {
+        const text = await navigator.clipboard.readText();
+        inputLyrics.value = text;
+        const processed = processLyrics(text);
+        outputLyrics.value = processed;
+        await navigator.clipboard.writeText(processed);
+        alert("已完成：貼上 → 轉換 → 複製");
+      } catch {
+        alert("無法一鍵完成，請手動操作");
+      }
+    });
 
-      // 一鍵完成：從剪貼簿貼上 → 處理 → 複製結果
-      document.getElementById("btnOneClick").addEventListener("click", async () => {
-        try {
-          const text = await navigator.clipboard.readText();
-          inputEl.value = text;
-          const processed = processLyrics(text);
-          outputEl.value = processed;
-          await navigator.clipboard.writeText(processed);
-          alert("✔ 已完成：貼上 ➜ 轉換 ➜ 複製！");
-        } catch (err) {
-          alert("⚠️ 無法一鍵完成，請分步操作（貼上 → 轉換 → 複製）。");
-        }
-      });
+
+    /* LINE 漂浮按鈕開關 */
+    const fabWrapper = document.getElementById("fabWrapper");
+    const fabMain = document.getElementById("fabMain");
+
+    fabMain.addEventListener("click", () => {
+      fabWrapper.classList.toggle("open");
+    });
+
+    document.addEventListener("click", e => {
+      if (!fabWrapper.contains(e.target)) fabWrapper.classList.remove("open");
     });
   </script>
+
 </body>
 </html>
