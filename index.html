@@ -165,17 +165,15 @@
       return text.replace(/[’‘ʼ´ʻ＇]/g, "'");
     }
 
-    // 2) 移除所有標點符號（中英文），只保留：
-    //    - 英文大小寫
-    //    - 數字
-    //    - 常用中文（U+4E00–U+9FFF）
-    //    - 空白（含換行）
-    //    - 半形撇號 '
+    // 2) 移除所有標點符號（中英文）
+    //    只保留：英文大小寫、數字、常用中文、空白（含換行）、半形撇號 '
     function removeAllPunctuation(text) {
+      // 先把全形空白變成一般空白，避免被當成其他字元
+      text = text.replace(/\u3000/g, " ");
       return text.replace(/[^a-zA-Z0-9\u4E00-\u9FFF\s']/g, "");
     }
 
-    // 3) 只有「中文」之間加空格，英文不動
+    // 3) 只有「中文」之間加空格，英文完全不動
     function addSpacesForChineseOnly(text) {
       const isCJK = ch => /[\u3400-\u4DBF\u4E00-\u9FFF]/.test(ch);
 
