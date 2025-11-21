@@ -2,232 +2,330 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <title>歌詞加空格｜LouisLiao Piano 鋼琴編曲</title>
+  <title>歌詞空格編輯器 · LouisLiao Piano 鋼琴編曲</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
   <style>
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif; }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      background: linear-gradient(135deg, #e8d9c5, #f4ede4);
+      font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif;
+      /* 接近官網的暖色背景 */
+      background: linear-gradient(135deg, #f7ecde, #f1dfc7);
       background-attachment: fixed;
+      color: #5b3a23;
     }
 
     .wrap {
       max-width: 1200px;
-      padding: 32px 16px 50px;
-      margin: auto;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
 
-    /* ----------------------------------------------------
-       🌟 LOGO：柔霧按鈕 + 點擊可回官網
-    ----------------------------------------------------- */
-    .logo-btn {
-      display: inline-block;
-      padding: 10px 22px;
-      font-size: 22px;
-      font-weight: 700;
-      color: #5a4635;
-      background: #fff7ec;
+    /* 上方品牌列（可點回官網） */
+    .brand-bar {
+      background: #fbead4;
       border-radius: 14px;
-      text-decoration: none;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-      transition: 0.25s;
-    }
-    .logo-btn:hover {
-      background: #fff1dd;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.18);
-      transform: translateY(-2px);
+      padding: 14px 22px;
+      box-shadow: 0 6px 16px rgba(0,0,0,.08);
+      display: inline-flex;
+      align-items: center;
     }
 
-    .sub {
-      color: #6e5b4a;
+    .brand-bar a {
+      text-decoration: none;
+      color: #5b3a23;
+      font-weight: 800;
+      letter-spacing: 1px;
+      font-size: 20px;
+    }
+
+    .brand-bar a span.sub {
+      font-weight: 600;
+      font-size: 16px;
+      margin-left: 6px;
+      opacity: .9;
+    }
+
+    .tips {
+      margin-top: 12px;
+      line-height: 1.8;
       font-size: 15px;
-      line-height: 1.7;
+    }
+
+    .tips span {
+      display: block;
     }
 
     .panel {
-      margin-top: 8px;
+      margin-top: 12px;
       display: grid;
-      grid-template-columns: 1.3fr auto 1.3fr;
+      grid-template-columns: 1.25fr auto 1.25fr;
       gap: 24px;
+      align-items: stretch;
     }
 
     textarea {
       width: 100%;
       min-height: 480px;
-      padding: 20px 22px;
-      border-radius: 20px;
-      border: none;
-      background: #ffffffcc;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.10);
-      font-size: 18px;
+      border-radius: 22px;
+      border: 1px solid #e2c9aa;
+      padding: 18px 20px;
+      font-size: 17px;
       line-height: 1.8;
-      outline: none;
       resize: vertical;
+      background: #fffdf7;
+      box-shadow: 0 6px 18px rgba(0,0,0,.08);
+      outline: none;
+      white-space: pre-wrap; /* 保留換行 */
     }
 
-    /* ----------------------------------------------------
-       🌟 柔和奶油系按鈕（溫柔、霧面、圓潤）
-    ----------------------------------------------------- */
+    textarea:focus {
+      box-shadow: 0 8px 22px rgba(0,0,0,.12);
+      border-color: #d7b483;
+    }
+
+    .textarea-label {
+      font-size: 15px;
+      margin-bottom: 6px;
+      opacity: .9;
+    }
+
     .btn-col {
       display: flex;
       flex-direction: column;
       gap: 18px;
       align-items: center;
+      justify-content: center;
     }
 
     .btn {
-      width: 160px;
-      padding: 14px 28px;
-      font-size: 20px;
       border: none;
-      border-radius: 40px;
-      font-weight: 700;
-      color: #5a4635;
-      background: linear-gradient(135deg, #fff4e3, #f1dbc4);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
       cursor: pointer;
-      transition: 0.22s ease;
+      border-radius: 999px;
+      padding: 14px 34px;
+      font-size: 18px;
+      font-weight: 800;
+      color: #5b3a23;
+      background: linear-gradient(135deg, #fce3c7, #f6cda5);
+      box-shadow:
+        0 8px 18px rgba(0,0,0,.16),
+        inset 0 0 0 1px rgba(255,255,255,.7);
+      transition:
+        transform .15s ease,
+        box-shadow .15s ease,
+        filter .15s ease;
+      white-space: nowrap;
+      min-width: 150px;
+    }
+
+    /* 依功能給一點不同色調（都偏柔和） */
+    .btn.paste {
+      background: linear-gradient(135deg, #fde0d4, #f9c7b2);
+    }
+    .btn.convert {
+      background: linear-gradient(135deg, #fde7c5, #f7cc8e);
+    }
+    .btn.copy {
+      background: linear-gradient(135deg, #e9e3dd, #d7d0c8);
+    }
+    .btn.clear {
+      background: linear-gradient(135deg, #f5d7d4, #f0b2aa);
+    }
+    .btn.oneclick {
+      background: linear-gradient(135deg, #f4e4c2, #e1c792);
     }
 
     .btn:hover {
-      background: linear-gradient(135deg, #ffe9cf, #efd3b5);
-      box-shadow: 0 6px 18px rgba(0,0,0,0.18);
       transform: translateY(-2px);
+      box-shadow: 0 10px 22px rgba(0,0,0,.2);
+      filter: brightness(1.03);
     }
 
     .btn:active {
       transform: translateY(0);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+      box-shadow: 0 5px 14px rgba(0,0,0,.16);
+      filter: brightness(.97);
+    }
+
+    .footer-note {
+      margin-top: 10px;
+      font-size: 13px;
+      opacity: .7;
+      text-align: center;
     }
 
     @media (max-width: 900px) {
-      .panel { grid-template-columns: 1fr; }
-      textarea { min-height: 280px; }
-      .btn-col { flex-direction: row; flex-wrap: wrap; }
-      .btn { flex: 1 1 42%; }
+      .panel {
+        grid-template-columns: 1fr;
+      }
+      textarea {
+        min-height: 260px;
+      }
+      .btn-col {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      .btn {
+        min-width: 0;
+        flex: 1 1 45%;
+        text-align: center;
+      }
     }
   </style>
 </head>
 
 <body>
-<div class="wrap">
+  <div class="wrap">
 
-  <!-- ⭐ 點擊回官網的 LOGO -->
-  <a href="https://louisliaopiano.com/" target="_blank" class="logo-btn">
-    LouisLiao Piano 鋼琴編曲
-  </a>
-
-  <!-- 規則文字 -->
-  <div class="sub">
-    ✔ 中文：移除標點，只保留字與空白，並自動「一字一空格」方便  Sibelius 輸入。<br>
-    ✔ 英文：移除標點（保留空白與撇號 '），不拆單字，由  Sibelius 自己排。
-  </div>
-
-  <div class="panel">
-
-    <!-- 左 -->
-    <textarea id="inputLyrics" placeholder="在這裡貼上原始歌詞（簡繁 / 英文皆可）"></textarea>
-
-    <!-- 按鈕區塊 -->
-    <div class="btn-col">
-      <button class="btn" id="btnPaste">貼上</button>
-      <button class="btn" id="btnConvert">轉換</button>
-      <button class="btn" id="btnCopy">複製</button>
-      <button class="btn" id="btnClear">清空</button>
-      <button class="btn" id="btnOneClick">一鍵完成</button>
+    <!-- 可點回官網的 Logo / 標題列 -->
+    <div class="brand-bar">
+      <a href="https://louisliaopiano.com/" target="_blank" rel="noopener noreferrer">
+        歌詞空格編輯器
+        <span class="sub">· LouisLiao Piano 鋼琴編曲</span>
+      </a>
     </div>
 
-    <!-- 右 -->
-    <textarea id="outputLyrics" placeholder="這裡會顯示處理後的歌詞…" readonly></textarea>
+    <div class="tips">
+      <span>✅ 中文：移除所有標點，只保留字與空白，並在相鄰中文字中插入「一字一空格」，方便 Sibelius 輸入歌詞。</span>
+      <span>✅ 英文：移除標點（保留空白與 '），不拆單字，其餘保持原樣，由 Sibelius 自己排版。</span>
+    </div>
 
+    <div class="panel">
+      <!-- 左邊：原始歌詞 -->
+      <div>
+        <div class="textarea-label">在這裡貼上原始歌詞（簡體／繁體／英文都可以）</div>
+        <textarea id="inputLyrics" placeholder="在這裡貼上原始歌詞…"></textarea>
+      </div>
+
+      <!-- 中間按鈕 -->
+      <div class="btn-col">
+        <button class="btn paste" id="btnPaste">貼上</button>
+        <button class="btn convert" id="btnConvert">轉換</button>
+        <button class="btn copy" id="btnCopy">複製</button>
+        <button class="btn clear" id="btnClear">清空</button>
+        <button class="btn oneclick" id="btnOneClick">一鍵完成</button>
+      </div>
+
+      <!-- 右邊：處理後歌詞 -->
+      <div>
+        <div class="textarea-label">這裡會顯示處理後的歌詞…</div>
+        <textarea id="outputLyrics" placeholder="按下『轉換』後會在這裡顯示結果" readonly></textarea>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      本工具完全在瀏覽器內運算，不會上傳任何內容到伺服器。
+    </div>
   </div>
-</div>
 
-<script>
-  function normalizeEnglishApostrophes(text) {
-    return text.replace(/[’‘ʼ´ʻ＇]/g, "'");
-  }
+  <script>
+    // 1) 統一奇怪的撇號成半形 '
+    function normalizeEnglishApostrophes(text) {
+      return text.replace(/[’‘ʼ´ʻ＇]/g, "'");
+    }
 
-  function removeAllPunctuation(text) {
-    return text.replace(/[^a-zA-Z0-9\u4E00-\u9FFF\s']/g, "");
-  }
+    // 2) 移除所有標點符號（中英文），只保留：
+    //    - 英文大小寫
+    //    - 數字
+    //    - 常用中文（U+4E00–U+9FFF）
+    //    - 空白（含換行）
+    //    - 半形撇號 '
+    function removeAllPunctuation(text) {
+      return text.replace(/[^a-zA-Z0-9\u4E00-\u9FFF\s']/g, "");
+    }
 
-  function addSpacesForChineseOnly(text) {
-    const isCJK = ch => /[\u3400-\u4DBF\u4E00-\u9FFF]/.test(ch);
-    return text
-      .split("\n")
-      .map(line => {
-        const chars = [...line];
-        let out = "";
-        for (let i = 0; i < chars.length; i++) {
-          const curr = chars[i];
-          const next = chars[i + 1];
-          out += curr;
-          if (!next) continue;
-          if (curr === " " || next === " ") continue;
-          if (isCJK(curr) && isCJK(next)) out += " ";
+    // 3) 只有「中文」之間加空格，英文不動
+    function addSpacesForChineseOnly(text) {
+      const isCJK = ch => /[\u3400-\u4DBF\u4E00-\u9FFF]/.test(ch);
+
+      return text
+        .split("\n")
+        .map(line => {
+          const chars = [...line];
+          let out = "";
+
+          for (let i = 0; i < chars.length; i++) {
+            const curr = chars[i];
+            const next = chars[i + 1];
+
+            out += curr;
+
+            if (!next) continue;
+            if (curr === " " || next === " ") continue;
+
+            if (isCJK(curr) && isCJK(next)) {
+              out += " ";
+            }
+          }
+          return out;
+        })
+        .join("\n");
+    }
+
+    // 4) 整體處理流程
+    function processLyrics(text) {
+      let t = text;
+      t = normalizeEnglishApostrophes(t); // 統一撇號
+      t = removeAllPunctuation(t);        // 清掉所有標點
+      t = addSpacesForChineseOnly(t);     // 中文加空格
+      return t;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const inputEl  = document.getElementById("inputLyrics");
+      const outputEl = document.getElementById("outputLyrics");
+
+      // 轉換
+      document.getElementById("btnConvert").addEventListener("click", () => {
+        outputEl.value = processLyrics(inputEl.value);
+      });
+
+      // 清空
+      document.getElementById("btnClear").addEventListener("click", () => {
+        inputEl.value  = "";
+        outputEl.value = "";
+      });
+
+      // 從剪貼簿貼到左邊
+      document.getElementById("btnPaste").addEventListener("click", async () => {
+        try {
+          const text = await navigator.clipboard.readText();
+          inputEl.value = text;
+        } catch (err) {
+          alert("⚠️ 無法讀取剪貼簿，請手動貼上。");
         }
-        return out;
-      })
-      .join("\n");
-  }
+      });
 
-  function processLyrics(text) {
-    let t = text;
-    t = normalizeEnglishApostrophes(t);
-    t = removeAllPunctuation(t);
-    t = addSpacesForChineseOnly(t);
-    return t;
-  }
+      // 把右邊複製回剪貼簿
+      document.getElementById("btnCopy").addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(outputEl.value);
+          alert("已複製！");
+        } catch (err) {
+          outputEl.select();
+          document.execCommand("copy");
+          alert("已嘗試複製，如未成功請手動複製。");
+        }
+      });
 
-  document.addEventListener("DOMContentLoaded", () => {
-    const inputEl = document.getElementById("inputLyrics");
-    const outputEl = document.getElementById("outputLyrics");
-
-    document.getElementById("btnConvert").addEventListener("click", () => {
-      outputEl.value = processLyrics(inputEl.value);
+      // 一鍵完成：從剪貼簿貼上 → 處理 → 複製結果
+      document.getElementById("btnOneClick").addEventListener("click", async () => {
+        try {
+          const text = await navigator.clipboard.readText();
+          inputEl.value = text;
+          const processed = processLyrics(text);
+          outputEl.value = processed;
+          await navigator.clipboard.writeText(processed);
+          alert("✔ 已完成：貼上 ➜ 轉換 ➜ 複製！");
+        } catch (err) {
+          alert("⚠️ 無法一鍵完成，請分步操作（貼上 → 轉換 → 複製）。");
+        }
+      });
     });
-
-    document.getElementById("btnClear").addEventListener("click", () => {
-      inputEl.value = "";
-      outputEl.value = "";
-    });
-
-    document.getElementById("btnPaste").addEventListener("click", async () => {
-      try {
-        inputEl.value = await navigator.clipboard.readText();
-      } catch (err) {
-        alert("⚠️ 無法讀取剪貼簿，請手動貼上。");
-      }
-    });
-
-    document.getElementById("btnCopy").addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(outputEl.value);
-      } catch {}
-      alert("已複製！");
-    });
-
-    document.getElementById("btnOneClick").addEventListener("click", async () => {
-      try {
-        const text = await navigator.clipboard.readText();
-        inputEl.value = text;
-        const processed = processLyrics(text);
-        outputEl.value = processed;
-        await navigator.clipboard.writeText(processed);
-        alert("✔ 已完成：貼上 → 處理 → 複製！");
-      } catch {
-        alert("⚠️ 無法一鍵完成，請分步操作。");
-      }
-    });
-  });
-</script>
-
+  </script>
 </body>
 </html>
