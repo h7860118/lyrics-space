@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <title>歌詞空格編輯器 · LouisLiao Piano 鋼琴編曲</title>
+  <title>歌詞空格編輯器｜LouisLiao Piano 鋼琴編曲</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     * { box-sizing: border-box; }
@@ -10,60 +10,89 @@
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif;
-      /* 接近官網的暖色背景 */
-      background: linear-gradient(135deg, #f7ecde, #f1dfc7);
+      background: #e9d8c0; /* 接近官網的米色底 */
+      background: radial-gradient(circle at top, #f7ecd7 0, #e3d1b7 45%, #dcc6aa 100%);
       background-attachment: fixed;
-      color: #5b3a23;
+      color: #5b3b26;
     }
 
     .wrap {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 24px 16px 40px;
+      padding: 24px 16px 48px;
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
 
-    /* 上方品牌列（可點回官網） */
-    .brand-bar {
-      background: #fbead4;
-      border-radius: 14px;
-      padding: 14px 22px;
-      box-shadow: 0 6px 16px rgba(0,0,0,.08);
+    /* --------------- 頂端區：標題 + 品牌 LOGO --------------- */
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .app-title {
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      color: #4d311f;
+    }
+
+    .brand-pill {
       display: inline-flex;
       align-items: center;
-    }
-
-    .brand-bar a {
-      text-decoration: none;
-      color: #5b3a23;
-      font-weight: 800;
-      letter-spacing: 1px;
-      font-size: 20px;
-    }
-
-    .brand-bar a span.sub {
-      font-weight: 600;
-      font-size: 16px;
-      margin-left: 6px;
-      opacity: .9;
-    }
-
-    .tips {
-      margin-top: 12px;
-      line-height: 1.8;
+      padding: 8px 18px;
+      border-radius: 999px;
+      background: #f8e7cf;
+      box-shadow: 0 4px 10px rgba(0,0,0,.18);
       font-size: 15px;
+      font-weight: 700;
+      color: #7b4b2c;
+      text-decoration: none;
+      gap: 8px;
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease, filter .15s ease;
+      white-space: nowrap;
     }
 
-    .tips span {
-      display: block;
+    .brand-pill::before {
+      content: "♪";
+      font-size: 17px;
     }
 
+    .brand-pill:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(0,0,0,.24);
+      filter: brightness(1.03);
+      background: #f9e1be;
+    }
+
+    .brand-pill:active {
+      transform: translateY(0);
+      box-shadow: 0 3px 8px rgba(0,0,0,.18);
+      filter: brightness(.97);
+    }
+
+    /* --------------- 說明文字 --------------- */
+    .subtitle {
+      opacity: .88;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .subtitle span {
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    /* --------------- 主體：左右歌詞 + 中間按鈕 --------------- */
     .panel {
-      margin-top: 12px;
+      margin-top: 10px;
       display: grid;
-      grid-template-columns: 1.25fr auto 1.25fr;
+      grid-template-columns: 1.4fr auto 1.4fr;
       gap: 24px;
       align-items: stretch;
     }
@@ -71,27 +100,20 @@
     textarea {
       width: 100%;
       min-height: 480px;
-      border-radius: 22px;
-      border: 1px solid #e2c9aa;
-      padding: 18px 20px;
+      border-radius: 24px;
+      border: none;
+      padding: 20px 22px;
       font-size: 17px;
       line-height: 1.8;
       resize: vertical;
-      background: #fffdf7;
-      box-shadow: 0 6px 18px rgba(0,0,0,.08);
+      background: #fdfaf6;
+      box-shadow: 0 10px 26px rgba(0,0,0,.18);
       outline: none;
       white-space: pre-wrap; /* 保留換行 */
     }
 
     textarea:focus {
-      box-shadow: 0 8px 22px rgba(0,0,0,.12);
-      border-color: #d7b483;
-    }
-
-    .textarea-label {
-      font-size: 15px;
-      margin-bottom: 6px;
-      opacity: .9;
+      box-shadow: 0 12px 30px rgba(0,0,0,.22);
     }
 
     .btn-col {
@@ -102,53 +124,51 @@
       justify-content: center;
     }
 
+    /* --------------- 溫柔版按鈕樣式 --------------- */
     .btn {
       border: none;
       cursor: pointer;
       border-radius: 999px;
-      padding: 14px 34px;
-      font-size: 18px;
+      padding: 16px 34px;
+      font-size: 19px;
       font-weight: 800;
-      color: #5b3a23;
-      background: linear-gradient(135deg, #fce3c7, #f6cda5);
+      color: #5a3b2a;
+      background: linear-gradient(145deg, #fbe4cc, #f2cfb0);
       box-shadow:
-        0 8px 18px rgba(0,0,0,.16),
-        inset 0 0 0 1px rgba(255,255,255,.7);
-      transition:
-        transform .15s ease,
-        box-shadow .15s ease,
-        filter .15s ease;
+        0 10px 18px rgba(0,0,0,.18),
+        inset 0 1px 0 rgba(255,255,255,.6);
+      transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
       white-space: nowrap;
       min-width: 150px;
+      text-align: center;
     }
 
-    /* 依功能給一點不同色調（都偏柔和） */
-    .btn.paste {
-      background: linear-gradient(135deg, #fde0d4, #f9c7b2);
+    .btn.blue {
+      background: linear-gradient(145deg, #f1dacb, #dfc1af);
     }
-    .btn.convert {
-      background: linear-gradient(135deg, #fde7c5, #f7cc8e);
+
+    .btn.red {
+      background: linear-gradient(145deg, #f6d3c5, #e5b7a7);
     }
-    .btn.copy {
-      background: linear-gradient(135deg, #e9e3dd, #d7d0c8);
-    }
-    .btn.clear {
-      background: linear-gradient(135deg, #f5d7d4, #f0b2aa);
-    }
-    .btn.oneclick {
-      background: linear-gradient(135deg, #f4e4c2, #e1c792);
+
+    .btn.green {
+      background: linear-gradient(145deg, #f0e1c8, #e1cfae);
     }
 
     .btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 22px rgba(0,0,0,.2);
-      filter: brightness(1.03);
+      box-shadow:
+        0 12px 22px rgba(0,0,0,.22),
+        inset 0 1px 0 rgba(255,255,255,.7);
+      filter: brightness(1.02);
     }
 
     .btn:active {
       transform: translateY(0);
-      box-shadow: 0 5px 14px rgba(0,0,0,.16);
-      filter: brightness(.97);
+      box-shadow:
+        0 6px 12px rgba(0,0,0,.18),
+        inset 0 1px 0 rgba(255,255,255,.55);
+      filter: brightness(.98);
     }
 
     .footer-note {
@@ -163,7 +183,7 @@
         grid-template-columns: 1fr;
       }
       textarea {
-        min-height: 260px;
+        min-height: 280px;
       }
       .btn-col {
         flex-direction: row;
@@ -171,8 +191,11 @@
       }
       .btn {
         min-width: 0;
-        flex: 1 1 45%;
-        text-align: center;
+        flex: 1 1 40%;
+      }
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
       }
     }
   </style>
@@ -180,41 +203,35 @@
 
 <body>
   <div class="wrap">
-
-    <!-- 可點回官網的 Logo / 標題列 -->
-    <div class="brand-bar">
-      <a href="https://louisliaopiano.com/" target="_blank" rel="noopener noreferrer">
-        歌詞空格編輯器
-        <span class="sub">· LouisLiao Piano 鋼琴編曲</span>
+    <!-- 頂端：標題 + LOGO 連回官網 -->
+    <div class="topbar">
+      <div class="app-title">歌詞空格編輯器</div>
+      <a class="brand-pill" href="https://louisliaopiano.com/" target="_blank" rel="noopener noreferrer">
+        LouisLiao Piano 鋼琴編曲
       </a>
     </div>
 
-    <div class="tips">
-      <span>✅ 中文：移除所有標點，只保留字與空白，並在相鄰中文字中插入「一字一空格」，方便 Sibelius 輸入歌詞。</span>
-      <span>✅ 英文：移除標點（保留空白與 '），不拆單字，其餘保持原樣，由 Sibelius 自己排版。</span>
+    <!-- 使用說明 -->
+    <div class="subtitle">
+      <span>✅ 中文：移除所有標點，只保留字與空白，並在相鄰中文字之間自動「一字一空格」，方便 Sibelius 輸入。</span><br>
+      <span>✅ 英文：移除標點（保留空白與 ' ），不拆單字，由 Sibelius 自己排版。</span>
     </div>
 
     <div class="panel">
       <!-- 左邊：原始歌詞 -->
-      <div>
-        <div class="textarea-label">在這裡貼上原始歌詞（簡體／繁體／英文都可以）</div>
-        <textarea id="inputLyrics" placeholder="在這裡貼上原始歌詞…"></textarea>
-      </div>
+      <textarea id="inputLyrics" placeholder="在這裡貼上原始歌詞（簡繁 / 繁體 / 英文都可以）"></textarea>
 
       <!-- 中間按鈕 -->
       <div class="btn-col">
-        <button class="btn paste" id="btnPaste">貼上</button>
-        <button class="btn convert" id="btnConvert">轉換</button>
-        <button class="btn copy" id="btnCopy">複製</button>
-        <button class="btn clear" id="btnClear">清空</button>
-        <button class="btn oneclick" id="btnOneClick">一鍵完成</button>
+        <button class="btn" id="btnPaste">貼上</button>
+        <button class="btn blue" id="btnConvert">轉換</button>
+        <button class="btn" id="btnCopy">複製</button>
+        <button class="btn red" id="btnClear">清空</button>
+        <button class="btn green" id="btnOneClick">一鍵完成</button>
       </div>
 
       <!-- 右邊：處理後歌詞 -->
-      <div>
-        <div class="textarea-label">這裡會顯示處理後的歌詞…</div>
-        <textarea id="outputLyrics" placeholder="按下『轉換』後會在這裡顯示結果" readonly></textarea>
-      </div>
+      <textarea id="outputLyrics" placeholder="這裡會顯示處理後的歌詞…" readonly></textarea>
     </div>
 
     <div class="footer-note">
