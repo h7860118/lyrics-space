@@ -34,6 +34,7 @@
       opacity: .85;
       font-size: 15px;
       margin-bottom: 6px;
+      line-height: 1.7;
     }
 
     .panel {
@@ -81,7 +82,7 @@
       color: #fff;
       box-shadow: 0 6px 14px rgba(0,0,0,.25);
       background: linear-gradient(135deg, #ff9a9e, #fecf73);
-      transition: transform .15s ease, box-shadow .15s ease, filter .15s.ease;
+      transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
       white-space: nowrap;
       width: 160px;
       text-align: center;
@@ -134,16 +135,13 @@
     <h1>歌詞加空格 made by 姚船長</h1>
 
     <div class="subtitle">
-      ✅ 中文：自動一字一空格（方便 Sibelius 輸入）<br>
-      ✅ 英文：不拆單字，只移除標點，其餘保持原樣<br>
-      ❌ 不含簡繁轉換（依用戶需求）
+      ✅ 中文：移除所有標點，只保留下排字＆空白，並自動「一字一空格」方便 Sibelius 輸入。<br>
+      ✅ 英文：移除標點（保留 ' 及空白），單字不拆，由 Sibelius 自己排。
     </div>
 
     <div class="panel">
-      <!-- 原始歌詞 -->
-      <textarea id="inputLyrics" placeholder="在這裡貼上歌詞（中英都可）"></textarea>
+      <textarea id="inputLyrics" placeholder="在這裡貼上原始歌詞（簡體 / 繁體 / 英文都可以）"></textarea>
 
-      <!-- 中間按鈕 -->
       <div class="btn-col">
         <button class="btn" id="btnPaste">貼上</button>
         <button class="btn blue" id="btnConvert">轉換</button>
@@ -152,69 +150,57 @@
         <button class="btn green" id="btnOneClick">一鍵完成</button>
       </div>
 
-      <!-- 處理後歌詞 -->
       <textarea id="outputLyrics" placeholder="這裡會顯示處理後的歌詞…" readonly></textarea>
     </div>
 
     <div class="footer-note">
-      本工具完全在瀏覽器中執行，不會上傳任何資料。
+      本工具完全在瀏覽器內運算，不會上傳任何內容到伺服器。
     </div>
   </div>
 
   <script>
-    /* 1. 統一英文撇號為 ' */
     function normalizeEnglishApostrophes(text) {
       return text.replace(/[’‘ʼ´ʻ＇]/g, "'");
     }
 
-    /* 2. 移除所有標點，只保留：
-          - 英文大小寫
-          - 數字
-          - 中文
-          - 空白（含換行）
-          - 半形撇號 '
-    */
     function removeAllPunctuation(text) {
       return text.replace(/[^a-zA-Z0-9\u4E00-\u9FFF\s']/g, "");
     }
 
-    /* 3. 只有中文一字一空格，英文不加 */
     function addSpacesForChineseOnly(text) {
       const isCJK = ch => /[\u3400-\u4DBF\u4E00-\u9FFF]/.test(ch);
 
       return text
         .split("\n")
         .map(line => {
-          let out = "";
           const chars = [...line];
+          let out = "";
 
           for (let i = 0; i < chars.length; i++) {
             const curr = chars[i];
             const next = chars[i + 1];
-
             out += curr;
 
             if (!next) continue;
             if (curr === " " || next === " ") continue;
 
-            if (isCJK(curr) && isCJK(next)) out += " ";
+            if (isCJK(curr) && isCJK(next)) {
+              out += " ";
+            }
           }
-
           return out;
         })
         .join("\n");
     }
 
-    /* 4. 主處理流程 */
     function processLyrics(text) {
-      let t = text || "";
+      let t = text;
       t = normalizeEnglishApostrophes(t);
       t = removeAllPunctuation(t);
       t = addSpacesForChineseOnly(t);
       return t;
     }
 
-    /* 5. DOM 綁定 */
     document.addEventListener("DOMContentLoaded", () => {
       const inputEl  = document.getElementById("inputLyrics");
       const outputEl = document.getElementById("outputLyrics");
@@ -224,7 +210,7 @@
       });
 
       document.getElementById("btnClear").addEventListener("click", () => {
-        inputEl.value = "";
+        inputEl.value  = "";
         outputEl.value = "";
       });
 
@@ -240,11 +226,11 @@
       document.getElementById("btnCopy").addEventListener("click", async () => {
         try {
           await navigator.clipboard.writeText(outputEl.value);
-          alert("✔ 已複製！");
+          alert("已複製！");
         } catch {
           outputEl.select();
           document.execCommand("copy");
-          alert("✔ 已嘗試複製，如未成功請手動複製。");
+          alert("已嘗試複製，如未成功請手動複製。");
         }
       });
 
@@ -255,9 +241,9 @@
           const processed = processLyrics(text);
           outputEl.value = processed;
           await navigator.clipboard.writeText(processed);
-          alert("✔ 一鍵完成：貼上 → 轉換 → 複製 !");
+          alert("✔ 已完成：貼上 ➜ 轉換 ➜ 複製！");
         } catch {
-          alert("⚠️ 無法一鍵完成，請手動操作。");
+          alert("⚠️ 無法一鍵完成，請分步操作（貼上 → 轉換 → 複製）。");
         }
       });
     });
