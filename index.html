@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <title>歌詞加空格工具</title>
+  <title>歌詞加空格 made by 姚船長</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     * { box-sizing: border-box; }
@@ -10,7 +10,8 @@
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif;
-      background: linear-gradient(135deg, #f8d7b8, #f2e6c2);
+      background: #d8ae78;
+      background: linear-gradient(135deg, #d8ae78, #f2e0c0);
       background-attachment: fixed;
     }
 
@@ -30,12 +31,13 @@
     }
 
     .subtitle {
-      opacity: .8;
+      opacity: .85;
       font-size: 15px;
       margin-bottom: 6px;
     }
 
     .panel {
+      margin-top: 8px;
       display: grid;
       grid-template-columns: 1.3fr auto 1.3fr;
       gap: 24px;
@@ -129,9 +131,10 @@
 
 <body>
   <div class="wrap">
-    <h1>歌詞加空格</h1>
+    <h1>歌詞加空格 made by 姚船長</h1>
     <div class="subtitle">
-      ✅ 中文：自動變成「一字一空格」方便 Sibelius 輸入　｜　✅ 英文：完全不更動（Done it all 就是 Done it all）
+      ✅ 中文：移除所有標點，只保留字＆空白，並自動「一字一空格」方便 Sibelius 輸入。<br>
+      ✅ 英文：移除所有標點（保留 ' 及空白），單字不拆，由 Sibelius 自己排。
     </div>
 
     <div class="panel">
@@ -147,8 +150,8 @@
         <button class="btn green" id="btnOneClick">一鍵完成</button>
       </div>
 
-      <!-- 右邊：加空格後歌詞 -->
-      <textarea id="outputLyrics" placeholder="這裡會顯示『中文加空格、英文原樣』的歌詞…" readonly></textarea>
+      <!-- 右邊：處理後歌詞 -->
+      <textarea id="outputLyrics" placeholder="這裡會顯示處理後的歌詞…" readonly></textarea>
     </div>
 
     <div class="footer-note">
@@ -157,19 +160,30 @@
   </div>
 
   <script>
-    // ⭐ 規則：
-    //   - 中文（CJK 字元）之間加空格：你可想起榕樹下 → 你 可 想 起 榕 樹 下
-    //   - 英文、數字、標點完全不動：Done it all → Done it all
+    // 1) 統一奇怪的撇號成半形 '
+    function normalizeEnglishApostrophes(text) {
+      return text.replace(/[’‘ʼ´ʻ＇]/g, "'");
+    }
+
+    // 2) 移除所有標點符號（中英文），只保留：
+    //    - 英文大小寫
+    //    - 數字
+    //    - 常用中文（U+4E00–U+9FFF）
+    //    - 空白（含換行）
+    //    - 半形撇號 '
+    function removeAllPunctuation(text) {
+      return text.replace(/[^a-zA-Z0-9\u4E00-\u9FFF\s']/g, "");
+    }
+
+    // 3) 只有「中文」之間加空格，英文不動
     function addSpacesForChineseOnly(text) {
-      // 判斷是否為 CJK 中日韓統一表意文字
-      const isCJK = ch =>
-        /[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]/.test(ch);
+      const isCJK = ch => /[\u3400-\u4DBF\u4E00-\u9FFF]/.test(ch);
 
       return text
-        .split('\n')
+        .split("\n")
         .map(line => {
           const chars = [...line];
-          let out = '';
+          let out = "";
 
           for (let i = 0; i < chars.length; i++) {
             const curr = chars[i];
@@ -177,17 +191,25 @@
 
             out += curr;
 
-            if (!next) continue;             // 行尾
-            if (curr === ' ' || next === ' ') continue; // 原本有空白就不動
+            if (!next) continue;
+            if (curr === " " || next === " ") continue;
 
-            // 只有「兩個都為中文」的時候才加空格
             if (isCJK(curr) && isCJK(next)) {
-              out += ' ';
+              out += " ";
             }
           }
           return out;
         })
-        .join('\n');
+        .join("\n");
+    }
+
+    // 4) 整體處理流程
+    function processLyrics(text) {
+      let t = text;
+      t = normalizeEnglishApostrophes(t); // 統一撇號
+      t = removeAllPunctuation(t);        // 清掉所有標點
+      t = addSpacesForChineseOnly(t);     // 中文加空格
+      return t;
     }
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -196,7 +218,7 @@
 
       // 轉換
       document.getElementById("btnConvert").addEventListener("click", () => {
-        outputEl.value = addSpacesForChineseOnly(inputEl.value);
+        outputEl.value = processLyrics(inputEl.value);
       });
 
       // 清空
@@ -205,7 +227,7 @@
         outputEl.value = "";
       });
 
-      // 從剪貼簿貼上到左邊
+      // 從剪貼簿貼到左邊
       document.getElementById("btnPaste").addEventListener("click", async () => {
         try {
           const text = await navigator.clipboard.readText();
@@ -227,14 +249,14 @@
         }
       });
 
-      // 一鍵完成：從剪貼簿貼上 → 只處理中文 → 再複製處理後內容
+      // 一鍵完成：從剪貼簿貼上 → 處理 → 複製結果
       document.getElementById("btnOneClick").addEventListener("click", async () => {
         try {
           const text = await navigator.clipboard.readText();
           inputEl.value = text;
-          const spaced = addSpacesForChineseOnly(text);
-          outputEl.value = spaced;
-          await navigator.clipboard.writeText(spaced);
+          const processed = processLyrics(text);
+          outputEl.value = processed;
+          await navigator.clipboard.writeText(processed);
           alert("✔ 已完成：貼上 ➜ 轉換 ➜ 複製！");
         } catch (err) {
           alert("⚠️ 無法一鍵完成，請分步操作（貼上 → 轉換 → 複製）。");
