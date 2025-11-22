@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>音檔轉 MP3 小工具｜LouisLiao Piano</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="在瀏覽器內將自己的音檔轉成 MP3，方便練習或備份使用。LouisLiao Piano 個人小工具。">
+
+  <!-- 版面風格：接近你官網的米白＋金色 -->
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", system-ui, sans-serif;
+      background: #f7f2e8;
+      color: #4b2f1e;
+    }
+
+    .wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 640px;
+      background: #fff8ec;
+      border-radius: 28px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+      padding: 28px 24px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border-radius: inherit;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7) inset;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .subtitle {
+      margin-bottom: 24px;
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .file-label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 20px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .file-label:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .file-name {
+      font-size: 14px;
+      opacity: 0.9;
+      min-height: 1.2em;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 26px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, #f6b23b, #d88921);
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(216, 137, 33, 0.55);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+      filter: none;
+    }
+
+    .btn-primary:not(:disabled):hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 28px rgba(216, 137, 33, 0.65);
+      filter: brightness(1.03);
+    }
+
+    .status {
+      margin-top: 14px;
+      font-size: 14px;
+      min-height: 1.4em;
+      white-space: pre-line;
+    }
+
+    .status span {
+      display: inline-block;
+    }
+
+    .status--ok {
+      color: #0b8a4a;
+      font-weight: 600;
+    }
+
+    .status--err {
+      color: #c62828;
+      font-weight: 600;
+    }
+
+    .download-area {
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+      font-weight: 700;
+      text-decoration: none;
+      color: #b36a00;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(243, 207, 140, 0.25);
+    }
+
+    .download-link:hover {
+      background: rgba(243, 207, 140, 0.45);
+    }
+
+    .note {
+      margin-top: 14px;
+      font-size: 12px;
+      opacity: 0.7;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 640px) {
+      .card {
+        padding: 22px 18px 22px;
+        border-radius: 24px;
+      }
+      h1 {
+        font-size: 21px;
+      }
+      .subtitle {
+        font-size: 14px;
+      }
+    }
+  </style>
+
+  <!-- ffmpeg.wasm：從 CDN 載入 -->
+  <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/ffmpeg.min.js"></script>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>音檔轉 MP3 小工具</h1>
+      <div class="subtitle">
+        上傳你自己的音檔（WAV、AAC、M4A⋯），在瀏覽器內直接轉成 MP3，方便練習或備份使用。
+      </div>
+
+      <div class="row">
+        <label class="file-label" for="fileInput">選擇檔案</label>
+        <div id="fileName" class="file-name">尚未選擇檔案</div>
+        <input id="fileInput" type="file" accept="audio/*" />
+      </div>
+
+      <button id="convertBtn" class="btn-primary" disabled>轉成 MP3</button>
+
+      <div id="status" class="status"></div>
+
+      <div id="downloadArea" class="download-area" style="display:none;">
+        <div>轉檔完成：</div>
+        <a id="downloadLink" class="download-link" href="#" download>
+          下載 MP3 檔案 🎧
+        </a>
+      </div>
+
+      <div class="note">
+        ⚠️ 轉檔完全在你的瀏覽器中運算，不會上傳到伺服器。  
+        建議在桌機或筆電使用，檔案較大時轉檔可能需要一些時間。
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 檢查 ffmpeg 是否載入成功
+    if (!window.FFmpeg) {
+      document.getElementById("status").innerHTML =
+        '<span class="status--err">無法載入轉檔模組（ffmpeg.wasm）。請確認網路環境後再試一次。</span>';
+    }
+
+    const { createFFmpeg, fetchFile } = FFmpeg;
+    const ffmpeg = createFFmpeg({ log: false });
+
+    const fileInput = document.getElementById("fileInput");
+    const fileNameEl = document.getElementById("fileName");
+    const convertBtn = document.getElementById("convertBtn");
+    const statusEl = document.getElementById("status");
+    const downloadArea = document.getElementById("downloadArea");
+    const downloadLink = document.getElementById("downloadLink");
+
+    let currentFile = null;
+    let objectUrl = null;
+
+    fileInput.addEventListener("change", () => {
+      const file = fileInput.files[0];
+      currentFile = file || null;
+      downloadArea.style.display = "none";
+
+      if (!file) {
+        fileNameEl.textContent = "尚未選擇檔案";
+        convertBtn.disabled = true;
+        return;
+      }
+
+      fileNameEl.textContent = file.name;
+      convertBtn.disabled = false;
+      statusEl.textContent = "";
+    });
+
+    convertBtn.addEventListener("click", async () => {
+      if (!currentFile) return;
+
+      try {
+        convertBtn.disabled = true;
+        fileInput.disabled = true;
+        statusEl.innerHTML = "初始化轉檔模組中，請稍候⋯";
+
+        if (!ffmpeg.isLoaded()) {
+          await ffmpeg.load();
+        }
+
+        statusEl.innerHTML = "開始轉檔中，請不要關閉此頁面⋯";
+
+        // 清掉舊的 Object URL
+        if (objectUrl) {
+          URL.revokeObjectURL(objectUrl);
+          objectUrl = null;
+        }
+
+        const inputName = "input_" + Date.now();
+        const outputName = "output.mp3";
+
+        ffmpeg.FS("writeFile", inputName, await fetchFile(currentFile));
+
+        // 轉成 MP3，192kbps
+        await ffmpeg.run("-i", inputName, "-acodec", "libmp3lame", "-ab", "192k", outputName);
+
+        const data = ffmpeg.FS("readFile", outputName);
+        const blob = new Blob([data.buffer], { type: "audio/mpeg" });
+        objectUrl = URL.createObjectURL(blob);
+
+        const baseName = currentFile.name.replace(/\.[^/.]+$/, "");
+        downloadLink.href = objectUrl;
+        downloadLink.download = baseName + ".mp3";
+
+        downloadArea.style.display = "block";
+        statusEl.innerHTML = '<span class="status--ok">✅ 轉檔完成，可以下載 MP3 檔案。</span>';
+
+        // 清除暫存檔案
+        ffmpeg.FS("unlink", inputName);
+        ffmpeg.FS("unlink", outputName);
+      } catch (err) {
+        console.error(err);
+        statusEl.innerHTML =
+          '<span class="status--err">轉檔失敗，可能是檔案格式不支援，或瀏覽器資源不足。</span>';
+        downloadArea.style.display = "none";
+      } finally {
+        convertBtn.disabled = !currentFile;
+        fileInput.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
