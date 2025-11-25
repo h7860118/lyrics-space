@@ -212,7 +212,7 @@
       inset: 0;
       display: none;             /* 預設隱藏 */
       justify-content: flex-end; /* 靠右 */
-      align-items: center;       /* 垂直置中（你要改成靠下也可以） */
+      align-items: center;       /* 垂直置中 */
       background: rgba(0,0,0,.25);
       z-index: 998;
     }
@@ -395,10 +395,11 @@
         <button type="button" class="line-modal-close" aria-label="關閉">×</button>
       </div>
       <div class="line-modal-body">
-        <!-- TODO: 把 src 換成你自己的 LINE QR 圖片網址 -->
-        <img class="line-modal-qr"
-             src="https://louisliaopiano.com/pages/llcs"
-             alt="加入 LINE 好友 QR Code" />
+        <img
+          class="line-modal-qr"
+          src="https://raw.githubusercontent.com/h7860118/lyrics-space/main/line_oa_chat_210222_223854.jpg"
+          alt="加入 LINE 好友 QR Code"
+        />
         <a class="line-modal-link"
            href="https://lin.ee/aAgocM5"
            target="_blank"
