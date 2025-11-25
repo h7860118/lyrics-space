@@ -206,6 +206,92 @@
       display: block;
     }
 
+    /* --------------- LINE 彈出小視窗（仿 EasyStore QR 卡片） --------------- */
+    .line-modal-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;             /* 預設隱藏 */
+      justify-content: flex-end; /* 靠右 */
+      align-items: center;       /* 垂直置中（你要改成靠下也可以） */
+      background: rgba(0,0,0,.25);
+      z-index: 998;
+    }
+
+    .line-modal {
+      width: 320px;
+      max-width: 90vw;
+      background: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+      margin-right: 22px;
+    }
+
+    .line-modal-header {
+      background: #06C755;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .line-modal-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .line-modal-logo-circle {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: #06C755;
+      font-weight: 700;
+    }
+
+    .line-modal-close {
+      border: none;
+      background: transparent;
+      color: #ffffff;
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+
+    .line-modal-body {
+      padding: 16px 18px 20px;
+      text-align: center;
+    }
+
+    .line-modal-qr {
+      width: 210px;
+      height: 210px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 14px;
+    }
+
+    .line-modal-link {
+      display: inline-block;
+      font-size: 14px;
+      color: #7b3bb2;
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .line-modal-link:hover {
+      text-decoration: underline;
+    }
+
     @media (max-width: 900px) {
       .panel {
         grid-template-columns: 1fr;
@@ -225,6 +311,9 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 10px;
+      }
+      .line-modal {
+        margin-right: 12px;
       }
     }
   </style>
@@ -277,9 +366,9 @@
     </div>
   </div>
 
-  <!-- LINE 客服漂浮按鈕（可拖曳 + 第三張圖片樣式） -->
-  <a id="lineFab" href="https://louisliaopiano.com/pages/llcs"
-     target="_blank" rel="noopener" aria-label="聯絡 LINE 客服">
+  <!-- LINE 客服漂浮按鈕 -->
+  <a id="lineFab" href="https://lin.ee/aAgocM5"
+     target="_blank" rel="noopener" aria-label="加入 LINE 官方帳號">
     <div class="line-fab-inner">
       <!-- 綠底圓形 + 白色對話框 + LINE 字樣 -->
       <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -294,6 +383,31 @@
       </svg>
     </div>
   </a>
+
+  <!-- LINE 彈出視窗：QR 卡片 -->
+  <div id="lineModalOverlay" class="line-modal-overlay" aria-hidden="true">
+    <div class="line-modal" role="dialog" aria-modal="true" aria-labelledby="lineModalTitle">
+      <div class="line-modal-header">
+        <div class="line-modal-header-left">
+          <div class="line-modal-logo-circle">LINE</div>
+          <div id="lineModalTitle">Line</div>
+        </div>
+        <button type="button" class="line-modal-close" aria-label="關閉">×</button>
+      </div>
+      <div class="line-modal-body">
+        <!-- TODO: 把 src 換成你自己的 LINE QR 圖片網址 -->
+        <img class="line-modal-qr"
+             src="https://louisliaopiano.com/pages/llcs"
+             alt="加入 LINE 好友 QR Code" />
+        <a class="line-modal-link"
+           href="https://lin.ee/aAgocM5"
+           target="_blank"
+           rel="noopener">
+          https://lin.ee/aAgocM5
+        </a>
+      </div>
+    </div>
+  </div>
 
   <script>
     // 1) 統一奇怪的撇號成半形 '
@@ -399,17 +513,22 @@
         }
       });
 
-      /* ---- LINE 按鈕拖曳功能 ---- */
+      /* ---- LINE 按鈕拖曳 + 彈出視窗 ---- */
       const fab = document.getElementById("lineFab");
+      const overlay = document.getElementById("lineModalOverlay");
+      const closeBtn = document.querySelector(".line-modal-close");
+
       if (!fab) return;
 
       let dragging = false;
+      let dragMoved = false;
       let offsetX = 0;
       let offsetY = 0;
       let pointerId = null;
 
       fab.addEventListener("pointerdown", (e) => {
         dragging = true;
+        dragMoved = false;
         pointerId = e.pointerId;
         fab.setPointerCapture(pointerId);
 
@@ -422,6 +541,8 @@
 
       window.addEventListener("pointermove", (e) => {
         if (!dragging || e.pointerId !== pointerId) return;
+
+        dragMoved = true;
 
         let x = e.clientX - offsetX;
         let y = e.clientY - offsetY;
@@ -448,6 +569,47 @@
 
         fab.style.transition = ""; // 結束拖曳恢復動畫
       });
+
+      // 點擊按鈕 → 開啟 QR 視窗（如果只是 click 而不是拖曳）
+      fab.addEventListener("click", (e) => {
+        // 若剛剛有拖動，就不要當成點擊
+        if (dragMoved) {
+          dragMoved = false;
+          return;
+        }
+
+        e.preventDefault(); // 不直接開新分頁
+
+        if (overlay) {
+          overlay.style.display = "flex";
+          overlay.setAttribute("aria-hidden", "false");
+        } else {
+          // 萬一 overlay 不在，就退回原本行為：開連結
+          const href = fab.getAttribute("href");
+          if (href) window.open(href, "_blank");
+        }
+      });
+
+      // 關閉視窗
+      function closeLineModal() {
+        if (!overlay) return;
+        overlay.style.display = "none";
+        overlay.setAttribute("aria-hidden", "true");
+      }
+
+      if (closeBtn) {
+        closeBtn.addEventListener("click", () => {
+          closeLineModal();
+        });
+      }
+
+      if (overlay) {
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) {
+            closeLineModal();
+          }
+        });
+      }
     });
   </script>
 </body>
