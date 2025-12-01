@@ -464,6 +464,8 @@
       t = normalizeEnglishApostrophes(t); // 統一撇號
       t = removeAllPunctuation(t);        // 清掉所有標點
       t = addSpacesForChineseOnly(t);     // 中文加空格
+      // 修正：若行尾及下一行開頭都是中文字，在其間補上一個空格，避免貼到 Sibelius 時兩字黏在一起
+      t = t.replace(/([\u3400-\u4DBF\u4E00-\u9FFF])\n([\u3400-\u4DBF\u4E00-\u9FFF])/g, "$1 \n$2");
       return t;
     }
 
