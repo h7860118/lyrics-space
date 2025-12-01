@@ -432,6 +432,9 @@
 
     // 3) 只有「中文」之間加空格，英文不動
     function addSpacesForChineseOnly(text) {
+      // 先把 CRLF / CR 正規成 LF，避免殘留 \r 在行內
+      text = text.replace(/\r\n?/g, "\n");
+
       const isCJK = ch => /[\u3400-\u4DBF\u4E00-\u9FFF]/.test(ch);
 
       return text
@@ -462,10 +465,19 @@
     function processLyrics(text) {
       let t = text;
       t = normalizeEnglishApostrophes(t); // 統一撇號
+
+      // 移除零寬字元（常見於網頁複製的隱形字元）
+      t = t.replace(/[\u200B-\u200D\uFEFF]/g, "");
+
+      // 將不常見空白（NBSP、全形空白）轉成一般空白
+      t = t.replace(/[\u00A0\u3000]/g, " ");
+
       t = removeAllPunctuation(t);        // 清掉所有標點
       t = addSpacesForChineseOnly(t);     // 中文加空格
-      // 修正：若行尾及下一行開頭都是中文字，在其間補上一個空格，避免貼到 Sibelius 時兩字黏在一起
+
+      // 行尾及下一行開頭都是中文字，在其間補上空格
       t = t.replace(/([\u3400-\u4DBF\u4E00-\u9FFF])\n([\u3400-\u4DBF\u4E00-\u9FFF])/g, "$1 \n$2");
+
       return t;
     }
 
@@ -579,7 +591,6 @@
 
       // 點擊按鈕 → 開啟 QR 視窗（如果只是 click 而不是拖曳）
       fab.addEventListener("click", (e) => {
-        // 若剛剛有拖動，就不要當成點擊
         if (dragMoved) {
           dragMoved = false;
           return;
@@ -591,7 +602,6 @@
           overlay.style.display = "flex";
           overlay.setAttribute("aria-hidden", "false");
         } else {
-          // 萬一 overlay 不在，就退回原本行為：開連結
           const href = fab.getAttribute("href");
           if (href) window.open(href, "_blank");
         }
