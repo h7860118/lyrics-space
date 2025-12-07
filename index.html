@@ -47,55 +47,56 @@
       font-size: 30px;
     }
 
-    /* ------- 官網膠囊：放大 logo 氣泡，比例跟藍色檢索頁接近 ------- */
+    /* ------- 新版官網膠囊（左邊圓形 logo + 奶茶膠囊） ------- */
     .brand-pill {
       position: relative;
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      padding: 12px 24px 12px 76px;  /* 左側留更多空間給放大後的圓圈 */
+      padding: 10px 20px 10px 48px;  /* 左邊留空給圓形 logo */
       border-radius: 999px;
       background: linear-gradient(135deg, #f9ebd6 0%, #f1d5af 100%);
       color: #5b3c25;
       font-size: 15px;
       font-weight: 700;
       text-decoration: none;
-      box-shadow: 0 12px 30px rgba(121, 85, 61, 0.30);
+      box-shadow: 0 10px 26px rgba(121, 85, 61, 0.28);
       transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
       white-space: nowrap;
       overflow: visible;
     }
 
+    /* 外層淡淡光暈（glow） */
     .brand-pill::before {
       content: "";
       position: absolute;
-      inset: -14px -26px;  /* 光暈再大一點，看起來比較像 iOS 卡片 */
+      inset: -10px -20px;
       border-radius: inherit;
-      background: radial-gradient(circle at center, rgba(250, 230, 200, 0.78), rgba(250, 230, 200, 0));
+      background: radial-gradient(circle at center, rgba(250, 230, 200, 0.7), rgba(250, 230, 200, 0));
       z-index: -1;
       pointer-events: none;
-      filter: blur(7px);
-      opacity: 0.95;
+      filter: blur(6px);
+      opacity: 0.9;
     }
 
     .brand-pill:hover {
       transform: translateY(-2px);
-      box-shadow: 0 16px 34px rgba(121, 85, 61, 0.38);
+      box-shadow: 0 14px 30px rgba(121, 85, 61, 0.35);
       filter: brightness(1.03);
     }
 
-    /* 左側 logo：放大、稍微外溢一點，更像貼在膠囊上的氣泡 */
+    /* 左側圓形 logo 氣泡 */
     .brand-pill-logo {
       position: absolute;
-      left: -4px;                  /* 讓圓圈稍微跑出膠囊左邊 */
+      left: 6px;
       top: 50%;
       transform: translateY(-50%);
-      width: 52px;
-      height: 52px;
+      width: 40px;
+      height: 40px;
       border-radius: 999px;
       background: #ffffff;
       overflow: hidden;
-      box-shadow: 0 14px 26px rgba(121, 85, 61, 0.50);
+      box-shadow: 0 12px 24px rgba(121, 85, 61, 0.4);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -113,6 +114,7 @@
       z-index: 1;
     }
 
+    /* 舊的音符字元就不用了，但保留 class 以防你哪裡有用到 */
     .brand-pill-icon {
       display: none;
     }
@@ -209,7 +211,7 @@
       text-align: center;
     }
 
-    /* --------------- LINE 漂浮客服按鈕（可拖曳） --------------- */
+    /* --------------- LINE 漂浮客服按鈕（可拖曳 + LINE 官方樣式） --------------- */
     #lineFab {
       position: fixed;
       right: 22px;
@@ -231,7 +233,7 @@
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      background-color: #06C755;
+      background-color: #06C755;   /* LINE 綠 */
       display: flex;
       align-items: center;
       justify-content: center;
@@ -250,6 +252,7 @@
       display: block;
     }
 
+    /* --------------- LINE 彈出小視窗（仿 EasyStore QR 卡片） --------------- */
     .line-modal-overlay {
       position: fixed;
       inset: 0;
@@ -364,13 +367,14 @@
 
 <body>
   <div class="wrap">
+    <!-- 上方：標題 + logo -->
     <div class="top-bar">
       <div class="top-title">
         <span class="top-title-emoji">🎵</span>
         <span>歌詞空格編輯器</span>
       </div>
 
-      <!-- 官網膠囊 -->
+      <!-- 新版官網膠囊 -->
       <a class="brand-pill" href="https://louisliaopiano.com" target="_blank" rel="noopener">
         <span class="brand-pill-logo">
           <img src="https://cdn.store-assets.com/s/715447/f/15885666.jpg" alt="LouisLiao Piano Logo" />
@@ -379,8 +383,273 @@
       </a>
     </div>
 
-    <!-- 以下內容保持不變（歌詞處理 + LINE 彈窗 JS） -->
-    <!-- ... 你可以直接沿用你現在那份的剩下部分 ... -->
+    <!-- 說明 -->
+    <div class="intro-list">
+      <div class="intro-item">✔ 中文：移除標點，只保留字與空白，自動在相鄰中文字中插入「一字一空格」，方便 Sibelius 輸入。</div>
+      <div class="intro-item">✔ 英文：保留單字與撇號，不拆字，僅移除標點。</div>
+      <div class="intro-item">✔ 本工具完全在瀏覽器運算，不會上傳任何資料。</div>
+    </div>
+
+    <!-- 主體：左歌詞 / 按鈕 / 右歌詞 -->
+    <div class="panel">
+      <div>
+        <p class="panel-label">在這裡貼上原始歌詞（簡體 / 繁體 / 英文皆可）</p>
+        <textarea id="inputLyrics" placeholder="在這裡貼上原始歌詞…"></textarea>
+      </div>
+
+      <div class="btn-col">
+        <button class="btn" id="btnPaste">貼上</button>
+        <button class="btn blue" id="btnConvert">轉換</button>
+        <button class="btn" id="btnCopy">複製</button>
+        <button class="btn red" id="btnClear">清空</button>
+        <button class="btn green" id="btnOneClick">一鍵完成</button>
+      </div>
+
+      <div>
+        <p class="panel-label">這裡會顯示處理後的歌詞…</p>
+        <textarea id="outputLyrics" placeholder="這裡會顯示處理後的歌詞…" readonly></textarea>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      本工具完全在瀏覽器內運算，不會上傳任何內容到伺服器。
+    </div>
   </div>
+
+  <!-- LINE 客服漂浮按鈕 -->
+  <a id="lineFab" href="https://lin.ee/aAgocM5"
+     target="_blank" rel="noopener" aria-label="加入 LINE 官方帳號">
+    <div class="line-fab-inner">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <path
+          d="M32 12C21 12 12 19.5 12 29c0 7.2 5.4 13.2 13.5 14.7L26 52l7.2-5.4C44 45.9 52 38.2 52 29 52 19.5 43 12 32 12z"
+          fill="#ffffff"
+        />
+        <text x="32" y="33" text-anchor="middle"
+              font-size="14" font-weight="700"
+              fill="#06c755"
+              font-family="-apple-system,BlinkMacSystemFont,'Noto Sans TC',sans-serif">
+          LINE
+        </text>
+      </svg>
+    </div>
+  </a>
+
+  <!-- LINE 彈出視窗：QR 卡片 -->
+  <div id="lineModalOverlay" class="line-modal-overlay" aria-hidden="true">
+    <div class="line-modal" role="dialog" aria-modal="true" aria-labelledby="lineModalTitle">
+      <div class="line-modal-header">
+        <div class="line-modal-header-left">
+          <div class="line-modal-logo-circle">LINE</div>
+          <div id="lineModalTitle">Line</div>
+        </div>
+        <button type="button" class="line-modal-close" aria-label="關閉">×</button>
+      </div>
+      <div class="line-modal-body">
+        <img
+          class="line-modal-qr"
+          src="https://raw.githubusercontent.com/h7860118/lyrics-space/main/line_oa_chat_210222_223854.jpg"
+          alt="加入 LINE 好友 QR Code"
+        />
+        <a class="line-modal-link"
+           href="https://lin.ee/aAgocM5"
+           target="_blank"
+           rel="noopener">
+          https://lin.ee/aAgocM5
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 下方 JS（跟你原本的一樣，未改動） -->
+  <script>
+    // 1) 統一奇怪的撇號成半形 '
+    function normalizeEnglishApostrophes(text) {
+      return text.replace(/[’‘ʼ´ʻ＇]/g, "'");
+    }
+
+    // 2) 移除所有標點符號（中英文），只保留：
+    //    - 英文大小寫
+    //    - 數字
+    //    - 常用中文（U+4E00–U9FFF）
+    //    - 空白（含換行）
+    //    - 半形撇號 '
+    function removeAllPunctuation(text) {
+      return text.replace(/[^a-zA-Z0-9\u4E00-\u9FFF\s']/g, "");
+    }
+
+    // 3) 只有「中文」之間加空格，英文不動
+    function addSpacesForChineseOnly(text) {
+      text = text.replace(/\r\n?/g, "\n");
+      const isCJK = ch => /[\u3400-\u4DBF\u4E00-\u9FFF]/.test(ch);
+
+      return text
+        .split("\n")
+        .map(line => {
+          const chars = [...line];
+          let out = "";
+          for (let i = 0; i < chars.length; i++) {
+            const curr = chars[i];
+            const next = chars[i + 1];
+            out += curr;
+            if (!next) continue;
+            if (curr === " " || next === " ") continue;
+            if (isCJK(curr) && isCJK(next)) {
+              out += " ";
+            }
+          }
+          return out;
+        })
+        .join("\n");
+    }
+
+    function processLyrics(text) {
+      let t = text;
+      t = normalizeEnglishApostrophes(t);
+      t = t.replace(/[\u200B-\u200D\uFEFF]/g, "");
+      t = t.replace(/[\u00A0\u3000]/g, " ");
+      t = t.replace(/[\u2028\u2029\u0085]/g, "\n");
+      t = removeAllPunctuation(t);
+      t = addSpacesForChineseOnly(t);
+      t = t.replace(/([\u3400-\u4DBF\u4E00-\u9FFF])\n([\u3400-\u4DBF\u4E00-\u9FFF])/g, "$1 \n$2");
+      t = t.replace(/([\u3400-\u4DBF\u4E00-\u9FFF])([\u3400-\u4DBF\u4E00-\u9FFF])/g, "$1 $2");
+      return t;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const inputEl  = document.getElementById("inputLyrics");
+      const outputEl = document.getElementById("outputLyrics");
+
+      document.getElementById("btnConvert").addEventListener("click", () => {
+        outputEl.value = processLyrics(inputEl.value);
+      });
+
+      document.getElementById("btnClear").addEventListener("click", () => {
+        inputEl.value  = "";
+        outputEl.value = "";
+      });
+
+      document.getElementById("btnPaste").addEventListener("click", async () => {
+        try {
+          const text = await navigator.clipboard.readText();
+          inputEl.value = text;
+        } catch (err) {
+          alert("⚠️ 無法讀取剪貼簿，請手動貼上。");
+        }
+      });
+
+      document.getElementById("btnCopy").addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(outputEl.value);
+          alert("已複製！");
+        } catch (err) {
+          outputEl.select();
+          document.execCommand("copy");
+          alert("已嘗試複製，如未成功請手動複製。");
+        }
+      });
+
+      document.getElementById("btnOneClick").addEventListener("click", async () => {
+        try {
+          const text = await navigator.clipboard.readText();
+          inputEl.value = text;
+          const processed = processLyrics(text);
+          outputEl.value = processed;
+          await navigator.clipboard.writeText(processed);
+          alert("✔ 已完成：貼上 ➜ 轉換 ➜ 複製！");
+        } catch (err) {
+          alert("⚠️ 無法一鍵完成，請分步操作（貼上 → 轉換 → 複製）。");
+        }
+      });
+
+      const fab = document.getElementById("lineFab");
+      const overlay = document.getElementById("lineModalOverlay");
+      const closeBtn = document.querySelector(".line-modal-close");
+
+      if (!fab) return;
+
+      let dragging = false;
+      let dragMoved = false;
+      let offsetX = 0;
+      let offsetY = 0;
+      let pointerId = null;
+
+      fab.addEventListener("pointerdown", (e) => {
+        dragging = true;
+        dragMoved = false;
+        pointerId = e.pointerId;
+        fab.setPointerCapture(pointerId);
+
+        const rect = fab.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+
+        fab.style.transition = "none";
+      });
+
+      window.addEventListener("pointermove", (e) => {
+        if (!dragging || e.pointerId !== pointerId) return;
+
+        dragMoved = true;
+
+        let x = e.clientX - offsetX;
+        let y = e.clientY - offsetY;
+
+        const margin = 8;
+        const maxX = window.innerWidth - fab.offsetWidth - margin;
+        const maxY = window.innerHeight - fab.offsetHeight - margin;
+
+        x = Math.min(Math.max(margin, x), maxX);
+        y = Math.min(Math.max(margin, y), maxY);
+
+        fab.style.left = x + "px";
+        fab.style.top = y + "px";
+        fab.style.right = "auto";
+        fab.style.bottom = "auto";
+      });
+
+      window.addEventListener("pointerup", (e) => {
+        if (!dragging || e.pointerId !== pointerId) return;
+
+        dragging = false;
+        fab.releasePointerCapture(pointerId);
+        pointerId = null;
+        fab.style.transition = "";
+      });
+
+      fab.addEventListener("click", (e) => {
+        if (dragMoved) {
+          dragMoved = false;
+          return;
+        }
+        e.preventDefault();
+        if (overlay) {
+          overlay.style.display = "flex";
+          overlay.setAttribute("aria-hidden", "false");
+        } else {
+          const href = fab.getAttribute("href");
+          if (href) window.open(href, "_blank");
+        }
+      });
+
+      function closeLineModal() {
+        if (!overlay) return;
+        overlay.style.display = "none";
+        overlay.setAttribute("aria-hidden", "true");
+      }
+
+      if (closeBtn) {
+        closeBtn.addEventListener("click", closeLineModal);
+      }
+
+      if (overlay) {
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) {
+            closeLineModal();
+          }
+        });
+      }
+    });
+  </script>
 </body>
 </html>
