@@ -47,30 +47,76 @@
       font-size: 30px;
     }
 
+    /* ------- 新版官網膠囊（左邊圓形 logo + 奶茶膠囊） ------- */
     .brand-pill {
+      position: relative;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 16px 9px;
+      gap: 10px;
+      padding: 10px 20px 10px 48px;  /* 左邊留空給圓形 logo */
       border-radius: 999px;
-      background: #f4e2c9;
+      background: linear-gradient(135deg, #f9ebd6 0%, #f1d5af 100%);
       color: #5b3c25;
       font-size: 15px;
       font-weight: 700;
       text-decoration: none;
-      box-shadow: 0 6px 18px rgba(0,0,0,.18);
-      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+      box-shadow: 0 10px 26px rgba(121, 85, 61, 0.28);
+      transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
       white-space: nowrap;
+      overflow: visible;
+    }
+
+    /* 外層淡淡光暈（glow） */
+    .brand-pill::before {
+      content: "";
+      position: absolute;
+      inset: -10px -20px;
+      border-radius: inherit;
+      background: radial-gradient(circle at center, rgba(250, 230, 200, 0.7), rgba(250, 230, 200, 0));
+      z-index: -1;
+      pointer-events: none;
+      filter: blur(6px);
+      opacity: 0.9;
     }
 
     .brand-pill:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 9px 22px rgba(0,0,0,.22);
-      background: #f9ebd6;
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(121, 85, 61, 0.35);
+      filter: brightness(1.03);
     }
 
+    /* 左側圓形 logo 氣泡 */
+    .brand-pill-logo {
+      position: absolute;
+      left: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      background: #ffffff;
+      overflow: hidden;
+      box-shadow: 0 12px 24px rgba(121, 85, 61, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-pill-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .brand-pill-text {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 舊的音符字元就不用了，但保留 class 以防你哪裡有用到 */
     .brand-pill-icon {
-      font-size: 17px;
+      display: none;
     }
 
     /* --------------- 說明文字 --------------- */
@@ -168,7 +214,7 @@
     /* --------------- LINE 漂浮客服按鈕（可拖曳 + LINE 官方樣式） --------------- */
     #lineFab {
       position: fixed;
-      right: 22px;     /* 初始位置 */
+      right: 22px;
       bottom: 22px;
       width: 58px;
       height: 58px;
@@ -210,9 +256,9 @@
     .line-modal-overlay {
       position: fixed;
       inset: 0;
-      display: none;             /* 預設隱藏 */
-      justify-content: flex-end; /* 靠右 */
-      align-items: center;       /* 垂直置中 */
+      display: none;
+      justify-content: flex-end;
+      align-items: center;
       background: rgba(0,0,0,.25);
       z-index: 998;
     }
@@ -327,9 +373,13 @@
         <span class="top-title-emoji">🎵</span>
         <span>歌詞空格編輯器</span>
       </div>
+
+      <!-- 新版官網膠囊 -->
       <a class="brand-pill" href="https://louisliaopiano.com" target="_blank" rel="noopener">
-        <span class="brand-pill-icon">♪</span>
-        <span>LouisLiao Piano 鋼琴編曲</span>
+        <span class="brand-pill-logo">
+          <img src="https://cdn.store-assets.com/s/715447/f/15885666.jpg" alt="LouisLiao Piano Logo" />
+        </span>
+        <span class="brand-pill-text">LouisLiao Piano 鋼琴編曲</span>
       </a>
     </div>
 
@@ -370,14 +420,11 @@
   <a id="lineFab" href="https://lin.ee/aAgocM5"
      target="_blank" rel="noopener" aria-label="加入 LINE 官方帳號">
     <div class="line-fab-inner">
-      <!-- 換成跟你另一個頁面一樣的 SVG：白色大泡泡 + 綠色 LINE 字 -->
       <svg viewBox="0 0 64 64" aria-hidden="true">
-        <!-- 白色對話框 -->
         <path
           d="M32 12C21 12 12 19.5 12 29c0 7.2 5.4 13.2 13.5 14.7L26 52l7.2-5.4C44 45.9 52 38.2 52 29 52 19.5 43 12 32 12z"
           fill="#ffffff"
         />
-        <!-- LINE 字樣 -->
         <text x="32" y="33" text-anchor="middle"
               font-size="14" font-weight="700"
               fill="#06c755"
@@ -414,6 +461,7 @@
     </div>
   </div>
 
+  <!-- 下方 JS（跟你原本的一樣，未改動） -->
   <script>
     // 1) 統一奇怪的撇號成半形 '
     function normalizeEnglishApostrophes(text) {
@@ -432,9 +480,7 @@
 
     // 3) 只有「中文」之間加空格，英文不動
     function addSpacesForChineseOnly(text) {
-      // 把 CRLF / CR 統一成 LF
       text = text.replace(/\r\n?/g, "\n");
-
       const isCJK = ch => /[\u3400-\u4DBF\u4E00-\u9FFF]/.test(ch);
 
       return text
@@ -442,16 +488,12 @@
         .map(line => {
           const chars = [...line];
           let out = "";
-
           for (let i = 0; i < chars.length; i++) {
             const curr = chars[i];
             const next = chars[i + 1];
-
             out += curr;
-
             if (!next) continue;
             if (curr === " " || next === " ") continue;
-
             if (isCJK(curr) && isCJK(next)) {
               out += " ";
             }
@@ -461,34 +503,16 @@
         .join("\n");
     }
 
-    // 4) 整體處理流程
     function processLyrics(text) {
       let t = text;
-
-      // 統一撇號
       t = normalizeEnglishApostrophes(t);
-
-      // 移除零寬字元（常見於網頁複製的隱形字元）
       t = t.replace(/[\u200B-\u200D\uFEFF]/g, "");
-
-      // 將不常見空白（NBSP、全形空白）轉成一般空白
       t = t.replace(/[\u00A0\u3000]/g, " ");
-
-      // ★ 把 LINE SEPARATOR / PARAGRAPH SEPARATOR / NEL 全部正規成真正的換行
       t = t.replace(/[\u2028\u2029\u0085]/g, "\n");
-
-      // 移除標點，只留中英文字 + 空白
       t = removeAllPunctuation(t);
-
-      // 中文之間加空格
       t = addSpacesForChineseOnly(t);
-
-      // 行尾及下一行開頭都是中文字，在其間補上空格
       t = t.replace(/([\u3400-\u4DBF\u4E00-\u9FFF])\n([\u3400-\u4DBF\u4E00-\u9FFF])/g, "$1 \n$2");
-
-      // 再保險：凡是相鄰兩個中文字，中間強制插入空格
       t = t.replace(/([\u3400-\u4DBF\u4E00-\u9FFF])([\u3400-\u4DBF\u4E00-\u9FFF])/g, "$1 $2");
-
       return t;
     }
 
@@ -496,18 +520,15 @@
       const inputEl  = document.getElementById("inputLyrics");
       const outputEl = document.getElementById("outputLyrics");
 
-      // 轉換
       document.getElementById("btnConvert").addEventListener("click", () => {
         outputEl.value = processLyrics(inputEl.value);
       });
 
-      // 清空
       document.getElementById("btnClear").addEventListener("click", () => {
         inputEl.value  = "";
         outputEl.value = "";
       });
 
-      // 從剪貼簿貼到左邊
       document.getElementById("btnPaste").addEventListener("click", async () => {
         try {
           const text = await navigator.clipboard.readText();
@@ -517,7 +538,6 @@
         }
       });
 
-      // 把右邊複製回剪貼簿
       document.getElementById("btnCopy").addEventListener("click", async () => {
         try {
           await navigator.clipboard.writeText(outputEl.value);
@@ -529,7 +549,6 @@
         }
       });
 
-      // 一鍵完成：從剪貼簿貼上 → 處理 → 複製結果
       document.getElementById("btnOneClick").addEventListener("click", async () => {
         try {
           const text = await navigator.clipboard.readText();
@@ -543,7 +562,6 @@
         }
       });
 
-      /* ---- LINE 按鈕拖曳 + 彈出視窗 ---- */
       const fab = document.getElementById("lineFab");
       const overlay = document.getElementById("lineModalOverlay");
       const closeBtn = document.querySelector(".line-modal-close");
@@ -566,7 +584,7 @@
         offsetX = e.clientX - rect.left;
         offsetY = e.clientY - rect.top;
 
-        fab.style.transition = "none"; // 拖曳時關掉位移動畫
+        fab.style.transition = "none";
       });
 
       window.addEventListener("pointermove", (e) => {
@@ -596,19 +614,15 @@
         dragging = false;
         fab.releasePointerCapture(pointerId);
         pointerId = null;
-
-        fab.style.transition = ""; // 結束拖曳恢復動畫
+        fab.style.transition = "";
       });
 
-      // 點擊按鈕 → 開啟 QR 視窗（如果只是 click 而不是拖曳）
       fab.addEventListener("click", (e) => {
         if (dragMoved) {
           dragMoved = false;
           return;
         }
-
-        e.preventDefault(); // 不直接開新分頁
-
+        e.preventDefault();
         if (overlay) {
           overlay.style.display = "flex";
           overlay.setAttribute("aria-hidden", "false");
@@ -618,7 +632,6 @@
         }
       });
 
-      // 關閉視窗
       function closeLineModal() {
         if (!overlay) return;
         overlay.style.display = "none";
@@ -626,9 +639,7 @@
       }
 
       if (closeBtn) {
-        closeBtn.addEventListener("click", () => {
-          closeLineModal();
-        });
+        closeBtn.addEventListener("click", closeLineModal);
       }
 
       if (overlay) {
